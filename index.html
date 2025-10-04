@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShrutiLipika - Real-time Indian Language Captioning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .caption-display {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        .caption-display::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
+        .glowing-border {
+            box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-600 dark:text-blue-400">ShrutiLipika</h1>
+            <p class="text-lg md:text-xl mt-2 text-gray-600 dark:text-gray-400">Real-time Closed Captioning in Indian Languages</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Panel: Controls -->
+            <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">Controls</h2>
+                
+                <!-- Start/Stop Button -->
+                <div class="flex justify-center mb-6">
+                    <button id="toggleBtn" class="w-full flex items-center justify-center gap-3 py-3 px-6 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 bg-green-500 hover:bg-green-600">
+                        <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                        <span id="btn-text">Start Captioning</span>
+                    </button>
+                </div>
+                
+                <!-- Status Indicator -->
+                <div id="status" class="text-center mb-6 p-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors">
+                    Status: Idle
+                </div>
+                
+                <!-- Settings -->
+                <div class="space-y-6">
+                    <div>
+                        <label for="languageSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Caption Language:</label>
+                        <select id="languageSelect" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <option value="en-IN">English (India)</option>
+                            <option value="hi-IN">Hindi (हिन्दी)</option>
+                            <option value="bn-IN">Bengali (বাংলা)</option>
+                            <option value="te-IN">Telugu (తెలుగు)</option>
+                            <option value="mr-IN">Marathi (मराठी)</option>
+                            <option value="ta-IN">Tamil (தமிழ்)</option>
+                            <option value="gu-IN">Gujarati (ગુજરાતી)</option>
+                            <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
+                            <option value="ml-IN">Malayalam (മലയാളം)</option>
+                            <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
+                            <!-- Other official languages as placeholders for the translation demo -->
+                            <option value="as">Assamese (অসমীয়া)</option>
+                            <option value="brx">Bodo (बर')</option>
+                            <option value="doi">Dogri (डोगरी)</option>
+                            <option value="ks">Kashmiri (کٲشُر)</option>
+                            <option value="kok">Konkani (कोंकणी)</option>
+                            <option value="mai">Maithili (मैथिली)</option>
+                            <option value="mni">Manipuri (ꯃꯤꯇꯩꯂꯣꯟ)</option>
+                            <option value="ne">Nepali (नेपाली)</option>
+                            <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                            <option value="sa">Sanskrit (संस्कृतम्)</option>
+                            <option value="sat">Santali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
+                            <option value="sd">Sindhi (सिन्धी)</option>
+                            <option value="ur">Urdu (اُردُو)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <label for="simplificationToggle" class="font-medium text-gray-700 dark:text-gray-300">Simplify Captions</label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="simplificationToggle" class="sr-only peer" checked>
+                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <label for="translationToggle" class="font-medium text-gray-700 dark:text-gray-300">Translate Captions</label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="translationToggle" class="sr-only peer" checked>
+                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Display Options -->
+                <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h3 class="text-xl font-bold mb-4">Display Options</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label for="fontSize" class="text-sm font-medium">Font Size:</label>
+                            <input id="fontSize" type="range" min="16" max="40" value="24" class="w-1/2 accent-blue-600">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium">Theme:</label>
+                            <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                                <!-- Sun/Moon icon will be inserted here by JS -->
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Panel: Captioning and Transcript -->
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+                <!-- Caption Display -->
+                <div id="caption-container" class="relative h-64 md:h-80 bg-gray-900 dark:bg-black p-6 rounded-xl overflow-y-auto mb-6 transition-all duration-300">
+                    <div id="caption-display" class="caption-display h-full flex flex-col justify-end">
+                        <p id="caption-text" class="text-white text-center transition-all duration-200" style="font-size: 24px;">Press "Start Captioning" to begin.</p>
+                    </div>
+                     <div id="live-indicator" class="absolute top-4 right-4 hidden items-center gap-2 text-white">
+                        <span class="relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                        LIVE
+                    </div>
+                </div>
+
+                <!-- Transcript Section -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">Full Transcript</h2>
+                        <button id="downloadBtn" class="flex items-center gap-2 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            Download
+                        </button>
+                    </div>
+                    <div id="transcript-output" class="h-64 p-4 bg-gray-100 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-y-auto text-sm text-gray-600 dark:text-gray-400">
+                        <!-- Transcript will appear here -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const toggleBtn = document.getElementById('toggleBtn');
+            const btnText = document.getElementById('btn-text');
+            const micIcon = document.getElementById('mic-icon');
+            const statusDiv = document.getElementById('status');
+            const languageSelect = document.getElementById('languageSelect');
+            const simplificationToggle = document.getElementById('simplificationToggle');
+            const translationToggle = document.getElementById('translationToggle');
+            const fontSizeSlider = document.getElementById('fontSize');
+            const themeToggle = document.getElementById('themeToggle');
+            const captionText = document.getElementById('caption-text');
+            const transcriptOutput = document.getElementById('transcript-output');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const captionContainer = document.getElementById('caption-container');
+            const liveIndicator = document.getElementById('live-indicator');
+
+            // --- State Variables ---
+            let isRecognizing = false;
+            let recognition;
+            let finalTranscript = '';
+
+            // --- Icons for Theme Toggle ---
+            const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+            const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+
+            // --- Speech Recognition Setup ---
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+
+                recognition.onstart = () => {
+                    isRecognizing = true;
+                    statusDiv.textContent = 'Status: Listening...';
+                    statusDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700');
+                    statusDiv.classList.add('bg-green-100', 'dark:bg-green-900', 'text-green-800', 'dark:text-green-200');
+                    toggleBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                    toggleBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+                    btnText.textContent = 'Stop Captioning';
+                    micIcon.innerHTML = `<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>`;
+                    captionContainer.classList.add('glowing-border');
+                    liveIndicator.classList.remove('hidden');
+                    liveIndicator.classList.add('flex');
+                };
+
+                recognition.onend = () => {
+                    isRecognizing = false;
+                    statusDiv.textContent = 'Status: Idle';
+                    statusDiv.classList.remove('bg-green-100', 'dark:bg-green-900', 'text-green-800', 'dark:text-green-200');
+                    statusDiv.classList.add('bg-gray-100', 'dark:bg-gray-700');
+                    toggleBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    toggleBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                    btnText.textContent = 'Start Captioning';
+                    captionContainer.classList.remove('glowing-border');
+                    liveIndicator.classList.add('hidden');
+                };
+
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            let finalChunk = event.results[i][0].transcript;
+                            finalTranscript += finalChunk.trim() + '. ';
+                            updateTranscript(finalChunk.trim() + '. ');
+                        } else {
+                            interimTranscript += event.results[i][0].transcript;
+                        }
+                    }
+                    processAndDisplay(interimTranscript.trim());
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    statusDiv.textContent = `Error: ${event.error}`;
+                };
+
+            } else {
+                statusDiv.textContent = 'Speech Recognition not supported in this browser.';
+                toggleBtn.disabled = true;
+            }
+
+            // --- UI Event Listeners ---
+            toggleBtn.addEventListener('click', () => {
+                if (isRecognizing) {
+                    recognition.stop();
+                } else {
+                    if (SpeechRecognition) {
+                        finalTranscript = '';
+                        transcriptOutput.innerHTML = '';
+                        recognition.lang = languageSelect.value;
+                        recognition.start();
+                    }
+                }
+            });
+
+            languageSelect.addEventListener('change', () => {
+                if (isRecognizing) {
+                    recognition.stop();
+                }
+            });
+            
+            fontSizeSlider.addEventListener('input', (e) => {
+                captionText.style.fontSize = `${e.target.value}px`;
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (!finalTranscript) return;
+                const blob = new Blob([finalTranscript], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `transcript-${new Date().toISOString()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            // --- Theme Management ---
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const currentTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    themeToggle.innerHTML = sunIcon;
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    themeToggle.innerHTML = moonIcon;
+                }
+            }
+            
+            applyTheme(currentTheme);
+            
+            themeToggle.addEventListener('click', () => {
+                const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+
+            // --- Logic Functions ---
+            
+            function updateTranscript(text) {
+                const p = document.createElement('p');
+                p.textContent = text;
+                transcriptOutput.appendChild(p);
+                transcriptOutput.scrollTop = transcriptOutput.scrollHeight;
+                downloadBtn.disabled = false;
+            }
+            
+            function processAndDisplay(text) {
+                if (!text) return;
+
+                let processedText = text;
+
+                // 1. Simplification Module (Rule-based simulation)
+                if (simplificationToggle.checked) {
+                    processedText = simplifyText(processedText);
+                }
+
+                // 2. Translation Module (Dictionary-based simulation)
+                if (translationToggle.checked && languageSelect.value.startsWith('hi')) {
+                    processedText = translateText(processedText, 'hi');
+                } else if (translationToggle.checked && languageSelect.value.startsWith('bn')) {
+                     processedText = translateText(processedText, 'bn');
+                }
+                // Add more else-if for other languages...
+
+                // 3. Display Captions
+                captionText.textContent = processedText;
+            }
+
+            function simplifyText(text) {
+                // Remove common filler words
+                const fillerWords = /\b(um|uh|er|ah|like|actually|basically|seriously|you know|i mean|so|well|okay|right|मतलब|तो|वैसे|हाँ|ठीक है)\b/gi;
+                let simplified = text.toLowerCase().replace(fillerWords, '').replace(/\s+/g, ' ').trim();
+                // Capitalize first letter
+                return simplified.charAt(0).toUpperCase() + simplified.slice(1);
+            }
+            
+            function translateText(text, targetLang) {
+                // This is a basic simulation of a translation API using a dictionary.
+                // A real implementation would use IndicTrans or Google Translate API.
+                const dictionary = {
+                    'en-hi': {
+                        'hello': 'नमस्ते',
+                        'how are you': 'आप कैसे हैं',
+                        'today we will learn': 'आज हम सीखेंगे',
+                        'photosynthesis in plants': 'पौधों में प्रकाश संश्लेषण',
+                        'thank you': 'धन्यवाद',
+                        'good morning': 'सुप्रभात'
+                    },
+                    'en-bn': {
+                        'hello': 'নমস্কার',
+                        'how are you': 'আপনি কেমন আছেন',
+                        'today we will learn': 'আজ আমরা শিখব',
+                        'photosynthesis in plants': 'গাছে সালোকসংশ্লেষ',
+                        'thank you': 'ধন্যবাদ',
+                        'good morning': 'সুপ্রভাত'
+                    }
+                };
+                
+                const key = `en-${targetLang}`;
+                if (dictionary[key]) {
+                    let translated = text.toLowerCase();
+                    for (const [eng, translatedWord] of Object.entries(dictionary[key])) {
+                        if (translated.includes(eng)) {
+                           translated = translated.replace(new RegExp(eng, 'g'), translatedWord);
+                        }
+                    }
+                    return translated.charAt(0).toUpperCase() + translated.slice(1);
+                }
+                return text; // Fallback to original text if no translation found
+            }
+        });
+    </script>
+</body>
+</html>
