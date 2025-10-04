@@ -1,113 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-time Closed Captioning (Indic)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Removed standard Firebase script tags. We now use module imports below. -->
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        /* Custom scrollbar for caption history */
-        #caption-history::-webkit-scrollbar { width: 8px; }
-        #caption-history::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
-        #caption-history::-webkit-scrollbar-track { background: #1f2937; }
-
-        .blinking-mic {
-            animation: pulse-border 1.5s infinite;
-        }
-
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-        }
-    </style>
-</head>
-<body class="bg-gray-900 text-gray-50 min-h-screen p-4 sm:p-8 flex flex-col items-center">
-
-    <div class="w-full max-w-4xl">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">
-                Indic Real-time Captioning
-            </h1>
-            <p class="text-gray-400">
-                Speech-to-Text, Simplification, and Multi-language Translation
-            </p>
-        </header>
-
-        <!-- Configuration Panel -->
-        <div class="bg-gray-800 p-4 sm:p-6 rounded-xl shadow-lg mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-            
-            <div class="flex items-center gap-4 w-full sm:w-auto">
-                <label for="target-language" class="text-gray-300 font-medium whitespace-nowrap">Translate to:</label>
-                <select id="target-language" class="bg-gray-700 text-white p-2 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto">
-                    <!-- Updated with all 22 Scheduled Indian Languages for translation -->
-                    <option value="Hindi" selected>Hindi (हिंदी)</option>
-                    <option value="Assamese">Assamese (অসমীয়া)</option>
-                    <option value="Bengali">Bengali (বাংলা)</option>
-                    <option value="Bodo">Bodo (बोडो)</option>
-                    <option value="Dogri">Dogri (डोगरी)</option>
-                    <option value="Gujarati">Gujarati (ગુજરાતી)</option>
-                    <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
-                    <option value="Kashmiri">Kashmiri (کٲشُر)</option>
-                    <option value="Konkani">Konkani (कोंकणी)</option>
-                    <option value="Maithili">Maithili (मैथिली)</option>
-                    <option value="Malayalam">Malayalam (മലയാളം)</option>
-                    <option value="Manipuri">Manipuri (মৈতৈ)</option>
-                    <option value="Marathi">Marathi (मराठी)</option>
-                    <option value="Nepali">Nepali (नेपाली)</option>
-                    <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
-                    <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
-                    <option value="Sanskrit">Sanskrit (संस्कृतम्)</option>
-                    <option value="Santhali">Santhali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
-                    <option value="Sindhi">Sindhi (सिन्धी)</option>
-                    <option value="Tamil">Tamil (தமிழ்)</option>
-                    <option value="Telugu">Telugu (తెలుగు)</option>
-                    <option value="Urdu">Urdu (اُردُو)</option>
-                </select>
-            </div>
-
-            <button id="toggle-mic" class="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-white transition duration-300 transform hover:scale-105 w-full sm:w-auto bg-blue-600 hover:bg-blue-700">
-                <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4z" clip-rule="evenodd" />
-                    <path fill-rule="evenodd" d="M11.668 11.28c.379.034.764.053 1.15.053 2.665 0 4.908-1.55 6.01-3.616a.75.75 0 01.373-.134.75.75 0 01.737.98 10.5 10.5 0 01-5.182 6.645 3.5 3.5 0 01-1.01.205c-.382 0-.756-.02-1.127-.058A7.5 7.5 0 015 12.378V10.75a.75.75 0 011.5 0v1.628c.365.04.735.066 1.11.066 1.259 0 2.454-.344 3.508-.957z" clip-rule="evenodd" />
-                    <path d="M15.5 14.5a3 3 0 10-6 0v2a3 3 0 106 0v-2z" />
-                </svg>
-                <span id="mic-status-text">Start Captioning</span>
-            </button>
-        </div>
-
-        <!-- Real-time Caption Area -->
-        <div class="bg-gray-800 p-4 sm:p-6 rounded-xl shadow-2xl">
-            <h2 class="text-xl font-semibold mb-4 text-blue-400">Live Captions</h2>
-            
-            <!-- Current Caption (Largest text for accessibility) -->
-            <div id="current-caption-container" class="min-h-[100px] flex items-center justify-center p-4 mb-4 rounded-lg border-2 border-blue-500 bg-gray-900">
-                <p id="current-caption" class="text-3xl sm:text-4xl font-bold text-green-400 text-center transition-opacity duration-500">
-                    Press "Start Captioning" and begin speaking in English or Hindi.
-                </p>
-                <div id="loading-spinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            </div>
-
-            <!-- Caption History (Scrolling list of previous simplified/translated captions) -->
-            <div class="mt-6">
-                <h3 class="text-lg font-medium text-gray-300 mb-2 border-b border-gray-700 pb-1">Caption History</h3>
-                <div id="caption-history" class="h-48 overflow-y-auto space-y-2 p-3 bg-gray-900 rounded-lg text-sm text-gray-300">
-                    <p class="text-gray-500 italic">Captions will appear here after each sentence is spoken.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Status/Log -->
-        <div id="status-log" class="mt-6 p-4 rounded-xl bg-gray-700 text-gray-300 text-sm">
-            <p>System Ready. Waiting for microphone input.</p>
-        </div>
-    </div>
-
-    <script type="module">
-        // Import Firebase modules for v9 syntax
+// Import Firebase modules for v9 syntax
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -132,7 +23,8 @@
         let isListening = false;
         let isProcessing = false;
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`;
-        const API_KEY = "AIzaSyBSXlBab087ifMqXRbXCF4B3I6p-SzNtr8"; // Canvas will inject the API key
+        const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+ // Canvas will inject the API key
 
         // --- Utility Functions ---
 
@@ -392,6 +284,3 @@
                 updateStatus(`Target language changed to ${targetLanguageSelect.value}.`, 'text-blue-300');
             });
         };
-    </script>
-</body>
-</html>

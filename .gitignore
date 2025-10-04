@@ -1,0 +1,14 @@
+# .gitignore
+
+# Dependencies and build outputs
+node_modules/
+dist/
+
+# Environment & secret keys
+.env
+.env.local
+
+# System files
+.DS_Store
+.vscode/
+*.log
