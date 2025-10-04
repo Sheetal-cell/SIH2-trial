@@ -3,56 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ekasruti: Aesthetic & Playful Captioner</title>
+    <title>Ekasruti: Aesthetic & Playful Captioner (Animated)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Varela+Round&display=swap');
+        
+        /* --- VIBRANT AESTHETIC CSS VARIABLES (Moody & Soft) --- */
+        :root, .dark-theme {
+            --color-bg-body: #0F121A; /* Very Dark Space Blue */
+            --color-bg-card-transparent: rgba(40, 44, 53, 0.75); /* Transparent Card */
+            --color-text-primary: #E5F4E3; 
+            --color-text-secondary: #90A8B0; 
+            --color-input-bg: rgba(60, 66, 81, 0.4); /* Transparent Input */
+            --color-border: rgba(77, 86, 99, 0.5); /* Transparent Border */
+            --color-accent: #FF6B6B; /* Vibrant Coral/Salmon */
+            --color-accent-hover: #E85B5B;
+            --color-success: #48E5C2; /* Aqua Green/Teal */
+            --color-danger: #F94C66; 
+            --color-shadow-inner: rgba(0, 0, 0, 0.6);
+        }
+
+        /* --- LIGHT THEME OVERRIDES (Pastel & Clean) --- */
+        .light-theme {
+            --color-bg-body: #F9FBFD; 
+            --color-bg-card-transparent: rgba(255, 255, 255, 0.85); /* Slightly less opaque */
+            --color-text-primary: #1C1E26;
+            --color-text-secondary: #607C8A;
+            --color-input-bg: rgba(240, 244, 248, 0.6); 
+            --color-border: rgba(209, 217, 230, 0.8);
+            --color-accent: #FF6B6B; 
+            --color-accent-hover: #E85B5B;
+            --color-success: #1DB9AA; 
+            --color-danger: #D84758; 
+            --color-shadow-inner: rgba(0, 0, 0, 0.15);
+        }
+        
+        /* --- BASE STYLES & FONT --- */
         body { 
             font-family: 'Inter', sans-serif; 
             transition: background-color 0.6s, color 0.6s; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden; /* Prevent horizontal scroll from background elements */
+            position: relative;
         }
 
-        /* --- VIBRANT AESTHETIC CSS VARIABLES (Moody & Soft) --- */
-        :root, .dark-theme {
-            --color-bg-body: #1C1E26; /* Dark Charcoal Blue */
-            --color-bg-card: #282C35; /* Slightly Lighter Card */
-            --color-text-primary: #E5F4E3; /* Soft Off-White */
-            --color-text-secondary: #90A8B0; /* Muted Blue-Gray */
-            --color-input-bg: #3C4251; /* Medium Gray */
-            --color-border: #4D5663;
-            --color-accent: #FF6B6B; /* Vibrant Coral/Salmon */
-            --color-accent-hover: #E85B5B;
-            --color-success: #48E5C2; /* Aqua Green/Teal */
-            --color-danger: #F94C66; /* Soft Red */
-            --color-shadow-inner: rgba(0, 0, 0, 0.4);
-        }
-
-        /* --- LIGHT THEME OVERRIDES (Pastel & Clean) --- */
-        .light-theme {
-            --color-bg-body: #F9FBFD; /* Near White */
-            --color-bg-card: #FFFFFF; /* Pure White */
-            --color-text-primary: #1C1E26;
-            --color-text-secondary: #607C8A;
-            --color-input-bg: #F0F4F8; /* Light Blue Gray */
-            --color-border: #D1D9E6;
-            --color-accent: #FF6B6B; 
-            --color-accent-hover: #E85B5B;
-            --color-success: #1DB9AA; /* Deeper Teal */
-            --color-danger: #D84758; 
-            --color-shadow-inner: rgba(0, 0, 0, 0.1);
-        }
-
-        /* Apply CSS variables via classes */
+        /* --- THEMED CLASSES with Transparency/Opacity --- */
         .themed-bg { background-color: var(--color-bg-body); }
         .themed-card { 
-            background-color: var(--color-bg-card); 
+            background-color: var(--color-bg-card-transparent); 
             color: var(--color-text-primary); 
             border: 2px solid var(--color-border);
-            box-shadow: 0 6px 15px var(--color-shadow-inner);
-            transition: all 0.3s ease-out;
+            box-shadow: 0 8px 30px var(--color-shadow-inner);
+            backdrop-filter: blur(10px); /* FROSTED GLASS EFFECT */
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.5s ease-out;
         }
         .themed-text { color: var(--color-text-primary); }
         .themed-text-secondary { color: var(--color-text-secondary); }
@@ -62,68 +68,137 @@
             color: var(--color-text-primary);
             transition: background-color 0.3s, border-color 0.3s;
         }
-        .translated-text-color { color: var(--color-success); }
-        .status-danger { color: var(--color-danger); }
 
-        /* --- Logo & Header --- */
-        .logo-text { font-family: 'Varela Round', sans-serif; }
-        .logo-box {
-            background-color: var(--color-accent);
-            box-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
+        /* --- BACKGROUND ANIMATION LAYER (Bubble Blob & Particles) --- */
+        #floating-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -10;
         }
 
-        /* --- Primary Button Aesthetic (Vibrant Coral) --- */
+        /* 1. Gradient Bubble Blob */
+        .bubble-blob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 700px;
+            height: 700px;
+            /* Faint, transparent gradient */
+            background: radial-gradient(circle, var(--color-accent) 0%, var(--color-success) 100%);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: -1;
+            animation: morph 20s infinite alternate, move 25s infinite linear;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes morph {
+            0% { border-radius: 40% 60% 70% 30% / 40% 40% 60% 60%; }
+            100% { border-radius: 60% 40% 30% 70% / 60% 60% 40% 40%; }
+        }
+
+        @keyframes move {
+            0% { transform: translate(-50%, -50%) translate(0vw, 0vh); }
+            33% { transform: translate(-50%, -50%) translate(15vw, -5vh); }
+            66% { transform: translate(-50%, -50%) translate(-10vw, 10vh); }
+            100% { transform: translate(-50%, -50%) translate(0vw, 0vh); }
+        }
+        
+        /* 2. Rainbow Stars/Particles */
+        #particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .rainbow-star {
+            position: absolute;
+            border-radius: 50%;
+            animation: drift 20s linear infinite, glow 3s alternate infinite;
+        }
+        
+        @keyframes drift {
+            0% { transform: translateY(0vh); opacity: 0.1; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(100vh); opacity: 0.1; }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+            100% { box-shadow: 0 0 15px currentColor, 0 0 30px currentColor; }
+        }
+
+        /* --- MIC & BUTTON ANIMATIONS --- */
         .btn-primary { 
             background-color: var(--color-accent); 
-            color: var(--color-bg-card); /* Text color contrast */
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.5);
-            transition: all 0.3s ease;
+            color: var(--color-bg-body);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.6);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth interaction curve */
         }
         .btn-primary:hover { 
             background-color: var(--color-accent-hover); 
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 15px rgba(255, 107, 107, 0.8);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.9);
         }
         
-        /* Mic Listening State (Aqua Pulse) */
+        /* Mic Listening State (Aqua Pulse) - ENHANCED */
         .mic-listening {
             background-color: var(--color-success); 
             color: var(--color-bg-body);
             box-shadow: 0 0 30px var(--color-success);
-            animation: pulse 1.5s infinite;
+            animation: pulse 1.5s infinite, breath 3s ease-in-out infinite;
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.05); opacity: 0.8; }
         }
+        @keyframes breath {
+            0%, 100% { box-shadow: 0 0 10px var(--color-success), 0 0 20px var(--color-success) inset; }
+            50% { box-shadow: 0 0 40px var(--color-success), 0 0 80px var(--color-success) inset; }
+        }
 
-        /* Prompt Box Active/Processing State */
-        .prompt-box-processing {
-            border-color: var(--color-success) !important;
-            background-color: var(--color-input-bg) !important;
+        /* Text Pop Animation for New Translations */
+        @keyframes textPop {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); filter: blur(5px); }
+            70% { opacity: 1; transform: scale(1.01) translateY(-2px); filter: blur(0px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
-        
-        /* History Panel Styling */
-        .history-item {
-            border-left: 4px solid var(--color-success);
-            background-color: var(--color-input-bg);
-            transition: all 0.2s;
+        .text-pop-animate {
+            animation: textPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27);
         }
-        .history-item:hover {
-            border-left: 8px solid var(--color-accent);
-            transform: translateX(3px);
+
+        /* Notification Styling */
+        #notification-bar {
+            /* ... existing styles ... */
+            background-color: var(--color-success);
+            color: var(--color-bg-body);
+            box-shadow: 0 4px 15px rgba(72, 229, 194, 0.5);
         }
     </style>
 </head>
 <body class="themed-bg dark-theme p-4 sm:p-8">
 
-    <div class="w-full max-w-4xl mx-auto flex-grow">
+    <!-- Floating Background Layer (Bubble Blob and Particles) -->
+    <div id="floating-bg">
+        <div class="bubble-blob"></div>
+        <div id="particle-container"></div>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="w-full max-w-4xl mx-auto flex-grow z-10">
         
         <!-- Header: Branding and Theme Toggle -->
         <header class="flex justify-between items-center mb-10 p-2">
             <div class="flex items-center">
-                <div class="p-3 rounded-full logo-box font-extrabold text-xl text-white logo-text hover:rotate-3 transition duration-300">Ek</div>
+                <div class="p-3 rounded-full logo-box font-extrabold text-xl text-white logo-text hover:rotate-3 transition duration-300 logo-box" style="background-color: var(--color-accent);">Ek</div>
                 <div class="ml-3">
                     <h1 class="text-3xl font-extrabold themed-text logo-text">Ekasruti</h1>
                     <p class="text-xs themed-text-secondary">Aesthetic Speech & Translation</p>
@@ -153,29 +228,29 @@
                 <div class="flex items-center gap-2 p-2 rounded-xl themed-input border border-dashed text-sm">
                     <span class="themed-text-secondary font-medium whitespace-nowrap">Source:</span>
                     <select id="source-language" class="bg-transparent font-bold focus:outline-none">
-                        <option value="English" selected>English</option>
-                        <option value="Hindi">Hindi (हिंदी)</option>
-                        <option value="Assamese">Assamese (অসমীয়া)</option>
-                        <option value="Bengali">Bengali (বাংলা)</option>
-                        <option value="Bodo">Bodo (बोडो)</option>
-                        <option value="Dogri">Dogri (डोगरी)</option>
-                        <option value="Gujarati">Gujarati (ગુજરાતી)</option>
-                        <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
-                        <option value="Kashmiri">Kashmiri (کٲشُر)</option>
-                        <option value="Konkani">Konkani (कोंकणी)</option>
-                        <option value="Maithili">Maithili (मैथिली)</option>
-                        <option value="Malayalam">Malayalam (മലയാളം)</option>
-                        <option value="Manipuri">Manipuri (মৈতৈ)</option>
-                        <option value="Marathi">Marathi (मराठी)</option>
-                        <option value="Nepali">Nepali (नेपाली)</option>
-                        <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
-                        <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
-                        <option value="Sanskrit">Sanskrit (संस्कृतम्)</option>
-                        <option value="Santhali">Santhali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
-                        <option value="Sindhi">Sindhi (सिन्धी)</option>
-                        <option value="Tamil">Tamil (தமிழ்)</option>
-                        <option value="Telugu">Telugu (తెలుగు)</option>
-                        <option value="Urdu">Urdu (اُردُو)</option>
+                        <option value="en-US" selected>English</option>
+                        <option value="hi-IN">Hindi (हिंदी)</option>
+                        <option value="as-IN">Assamese (অসমীয়া)</option>
+                        <option value="bn-IN">Bengali (বাংলা)</option>
+                        <option value="brx-IN">Bodo (बोडो)</option>
+                        <option value="doi-IN">Dogri (डोगरी)</option>
+                        <option value="gu-IN">Gujarati (ગુજરાતી)</option>
+                        <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
+                        <option value="ks-IN">Kashmiri (کٲشُر)</option>
+                        <option value="kok-IN">Konkani (कोंकणी)</option>
+                        <option value="mai-IN">Maithili (मैथिली)</option>
+                        <option value="ml-IN">Malayalam (മലയാളം)</option>
+                        <option value="mni-IN">Manipuri (মৈতৈ)</option>
+                        <option value="mr-IN">Marathi (मराठी)</option>
+                        <option value="ne-IN">Nepali (नेपाली)</option>
+                        <option value="or-IN">Odia (ଓଡ଼ିଆ)</option>
+                        <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
+                        <option value="sa-IN">Sanskrit (संस्कृतम्)</option>
+                        <option value="sat-IN">Santhali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
+                        <option value="sd-IN">Sindhi (सिन्धी)</option>
+                        <option value="ta-IN">Tamil (தமிழ்)</option>
+                        <option value="te-IN">Telugu (తెలుగు)</option>
+                        <option value="ur-IN">Urdu (اُردُو)</option>
                     </select>
                 </div>
                 
@@ -191,12 +266,12 @@
                         <option value="Gujarati">Gujarati (ગુજરાતી)</option>
                         <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
                         <option value="Kashmiri">Kashmiri (کٲشُر)</option>
-                        <option value="Konkani">Konkani (कोंकणी)</option>
+                        <option value="Konkani">Konkani (कोंকणी)</option>
                         <option value="Maithili">Maithili (मैथिली)</option>
                         <option value="Malayalam">Malayalam (മലയാളം)</option>
                         <option value="Manipuri">Manipuri (মৈতৈ)</option>
                         <option value="Marathi">Marathi (मराठी)</option>
-                        <option value="Nepali">Nepali (नेपाली)</option>
+                        <option value="Nepali">Nepali (নেपाली)</option>
                         <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
                         <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
                         <option value="Sanskrit">Sanskrit (संस्कृतम्)</option>
@@ -219,7 +294,7 @@
             </div>
 
             <!-- Start Button (Coral Accent) -->
-            <button id="toggle-mic" class="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-white transition duration-300 transform w-full md:w-auto btn-primary uppercase">
+            <button id="toggle-mic" class="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold transition duration-300 transform w-full md:w-auto uppercase btn-primary">
                 <span id="mic-status-text">Start Captioning</span>
             </button>
         </div>
@@ -254,7 +329,7 @@
             <!-- 3. Translated Text Box (Target Language) - Highlighted Teal -->
             <div class="mt-4 p-4 rounded-xl themed-input border-dashed border shadow-lg" style="box-shadow: 0 0 15px rgba(72, 229, 194, 0.2);">
                 <p class="text-sm font-semibold themed-text-secondary mb-1" id="translated-language-label">Translated Text (Hindi) - FOCUS:</p>
-                <p id="translated-text-display" class="text-4xl font-extrabold translated-text-color min-h-[40px] transition duration-300" style="font-size: 2.5rem;">...</p>
+                <p id="translated-text-display" class="text-4xl font-extrabold translated-text-color min-h-[40px] transition duration-300" style="font-size: 2.5rem; color: var(--color-success);">...</p>
             </div>
         </div>
 
@@ -285,6 +360,10 @@
             <p class="themed-text-secondary">System Ready. Waiting for activation.</p>
         </div>
     </div>
+    
+    <!-- Floating Notification Bar -->
+    <div id="notification-bar" class="fixed bottom-5 py-2 px-5 text-sm transform translate-y-full transition-all"></div>
+
 
     <script type="module">
         // --- Firebase Imports & Setup (Required for Canvas) ---
@@ -318,20 +397,21 @@
         const captionHistoryList = document.getElementById('caption-history-list');
         const historyPlaceholder = document.getElementById('history-placeholder');
         const downloadHistoryButton = document.getElementById('download-history');
+        const notificationBar = document.getElementById('notification-bar');
         
         // --- State Variables ---
         let recognition;
         let isListening = false;
         let isProcessing = false;
         let isDarkMode = true;
-        let captionHistory = []; // Local array for history storage
-        let currentFontSize = 2.5; // Initial font size for translated text (in rem)
+        let captionHistory = []; 
+        let currentFontSize = 2.5; 
         const MIN_FONT_SIZE = 1.5;
         const MAX_FONT_SIZE = 4.0;
         const FONT_STEP = 0.5;
         
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`;
-        const API_KEY = "AIzaSyBSXlBab087ifMqXRbXCF4B3I6p-SzNtr8"; // Important: Leave empty string.
+        const API_KEY = "AIzaSyBSXlBab087ifMqXRbXCF4B3I6p-SzNtr8"; 
 
         // --- Theme Functions ---
         function toggleTheme() {
@@ -349,8 +429,19 @@
             }
         }
 
-
         // --- Utility Functions ---
+
+        /**
+         * Shows a temporary, visually prominent notification bar.
+         */
+        function showNotification(message) {
+            notificationBar.textContent = message;
+            notificationBar.classList.add('notification-show');
+            
+            setTimeout(() => {
+                notificationBar.classList.remove('notification-show');
+            }, 2500);
+        }
 
         /**
          * Logs status messages to the UI.
@@ -375,6 +466,31 @@
             }
         }
 
+        // --- Background Particle Generation ---
+        function createParticles() {
+            const container = document.getElementById('particle-container');
+            const particleCount = 50;
+            const maxDuration = 25; // seconds for drift animation
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'rainbow-star';
+                
+                // Randomize position, size, and animation delay/duration
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                particle.style.width = particle.style.height = `${Math.random() * 4 + 2}px`;
+                particle.style.animationDelay = `${Math.random() * maxDuration}s`;
+                particle.style.animationDuration = `${Math.random() * maxDuration / 2 + maxDuration}s`;
+                
+                // Rainbow color cycle using HSL
+                particle.style.backgroundColor = `hsl(${i * 360 / particleCount}, 100%, 70%)`; 
+                particle.style.opacity = Math.random() * 0.4 + 0.1; // Very faint
+
+                container.appendChild(particle);
+            }
+        }
+        
         // --- Caption History & Download Functions ---
 
         /**
@@ -405,6 +521,7 @@
         function downloadHistory() {
             if (captionHistory.length === 0) {
                 updateStatus("History is empty. Nothing to download!", 'status-danger');
+                showNotification("History is empty!");
                 return;
             }
 
@@ -422,6 +539,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             updateStatus("Caption history downloaded successfully!", 'text-green-400');
+            showNotification("History downloaded!");
         }
 
         // --- Font Size Adjustment ---
@@ -432,13 +550,13 @@
         fontIncreaseButton.addEventListener('click', () => {
             currentFontSize = Math.min(MAX_FONT_SIZE, currentFontSize + FONT_STEP);
             updateFontSize();
-            updateStatus(`Font size increased to ${currentFontSize}rem.`, 'themed-text-secondary');
+            showNotification(`Size: ${currentFontSize.toFixed(1)}rem`);
         });
 
         fontDecreaseButton.addEventListener('click', () => {
             currentFontSize = Math.max(MIN_FONT_SIZE, currentFontSize - FONT_STEP);
             updateFontSize();
-            updateStatus(`Font size decreased to ${currentFontSize}rem.`, 'themed-text-secondary');
+            showNotification(`Size: ${currentFontSize.toFixed(1)}rem`);
         });
 
         // --- ML/API Pipeline (Simplification & Translation) ---
@@ -504,9 +622,12 @@
                 const translatedCaption = parsedData.translated_text || 'Translation unavailable.';
                 const simplifiedEnglish = parsedData.simplified_english_text || 'Simplification unavailable.';
 
-                // Update UI
+                // Update UI with a quick animation
                 simplifiedEnglishText.textContent = simplifiedEnglish;
                 translatedTextDisplay.textContent = translatedCaption;
+                // Add class to trigger animation and remove it after
+                translatedTextDisplay.classList.add('text-pop-animate');
+                setTimeout(() => translatedTextDisplay.classList.remove('text-pop-animate'), 600);
 
                 // Save to history
                 saveToHistory(simplifiedEnglish, translatedCaption, targetLanguage);
@@ -516,6 +637,7 @@
                 currentCaptionPrompt.classList.remove('status-danger');
                 currentCaptionPrompt.classList.add('themed-text'); 
                 currentCaptionPrompt.classList.remove('hidden');
+                showNotification(`Translated to ${targetLanguage}!`);
 
                 updateStatus(`Caption delivered and saved to history.`, 'text-green-400');
 
@@ -529,6 +651,7 @@
                 currentCaptionPrompt.classList.add('status-danger');
                 currentCaptionPrompt.classList.remove('themed-text');
                 currentCaptionPrompt.classList.remove('hidden');
+                showNotification("Translation Failed!");
 
                 updateStatus(`Critical error in ML pipeline: ${error.message}`, 'status-danger');
             } finally {
@@ -538,6 +661,11 @@
                 // Revert prompt box visual state
                 promptBox.classList.remove('prompt-box-processing');
                 promptBox.classList.add('border-dashed');
+                
+                // Re-start recognition if it wasn't paused due to an error
+                if (isListening && recognition.state !== 'listening') {
+                    recognition.start();
+                }
             }
         }
 
@@ -553,7 +681,8 @@
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
 
-            recognition.lang = 'en-US'; 
+            // Set language based on selection. Note: browser support varies greatly.
+            recognition.lang = sourceLanguageSelect.value || 'en-US'; 
             recognition.continuous = true; 
             recognition.interimResults = true; 
 
@@ -563,7 +692,7 @@
                 toggleMicButton.classList.add('mic-listening');
                 micIndicatorVisual.classList.remove('bg-gray-500');
                 micIndicatorVisual.classList.add('mic-listening');
-                // Status text is handled by CSS pulse animation
+                
                 document.getElementById('mic-status-text').textContent = 'STOP LISTENING';
 
                 simplifiedEnglishText.textContent = "Listening for a complete sentence...";
@@ -574,6 +703,7 @@
                 currentCaptionPrompt.classList.add('status-danger');
                 
                 updateStatus('Microphone is ON. Capturing speech.', 'text-green-400');
+                showNotification("Microphone is ACTIVE");
             };
 
             recognition.onend = () => {
@@ -620,7 +750,7 @@
                     processAndTranslate(
                         finalTranscript.trim(), 
                         targetLanguageSelect.value, 
-                        sourceLanguageSelect.value
+                        sourceLanguageSelect.options[sourceLanguageSelect.selectedIndex].text 
                     );
                 }
             };
@@ -628,6 +758,7 @@
             recognition.onerror = (event) => {
                 console.error('Speech Recognition Error:', event.error);
                 updateStatus(`ERROR: Speech Recognition failed. (${event.error})`, 'status-danger');
+                showNotification(`Mic Error: ${event.error}`);
                 if (isListening) recognition.stop();
             };
         }
@@ -642,9 +773,12 @@
                 recognition.stop();
             } else {
                 try {
+                    // Re-assign language when starting
+                    recognition.lang = sourceLanguageSelect.value;
                     recognition.start();
                 } catch (e) {
                     console.error("Recognition start error:", e);
+                    updateStatus(`Error starting mic: ${e.message}`, 'status-danger');
                 }
             }
         });
@@ -656,10 +790,15 @@
         targetLanguageSelect.addEventListener('change', (e) => {
             translatedLanguageLabel.textContent = `Translated Text (${e.target.value}) - FOCUS:`;
             updateStatus(`Target language changed to ${e.target.value}.`, 'themed-text-secondary');
+            showNotification(`Target: ${e.target.value}`);
         });
 
         sourceLanguageSelect.addEventListener('change', (e) => {
-            updateStatus(`Source language changed to ${e.target.value}. (STT currently defaults to English)`, 'themed-text-secondary');
+            updateStatus(`Source language changed to ${e.target.options[e.target.selectedIndex].text}. (STT language updated)`, 'themed-text-secondary');
+            showNotification(`Source: ${e.target.options[e.target.selectedIndex].text}`);
+            if (recognition) {
+                recognition.lang = e.target.value;
+            }
         });
 
         // Initialize Firebase (boilerplate requirement)
@@ -694,13 +833,14 @@
         window.onload = () => {
             // Initialize theme (starts dark)
             toggleTheme(); 
-            toggleTheme();
+            toggleTheme(); // Set to light initially, then back to dark, ensuring classes are applied correctly
             updateFontSize(); // Apply initial font size
+            createParticles(); // Initialize the moving background particles
 
             initializeFirebase();
             setupSpeechRecognition();
             translatedLanguageLabel.textContent = `Translated Text (${targetLanguageSelect.value}) - FOCUS:`;
-            updateStatus('Ekasruti v5: Aesthetic system loaded. Ready to capture!', 'themed-text');
+            updateStatus('Ekasruti v6: Aesthetic system loaded with dynamic UI. Ready to capture!', 'themed-text');
         };
     </script>
 </body>
