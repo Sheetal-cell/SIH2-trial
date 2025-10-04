@@ -1,107 +1,240 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-time Closed Captioning (Indic)</title>
+    <title>Ekasruti: Real-time Closed Captioning (Indic)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Removed standard Firebase script tags. We now use module imports below. -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        /* Custom scrollbar for caption history */
-        #caption-history::-webkit-scrollbar { width: 8px; }
-        #caption-history::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
-        #caption-history::-webkit-scrollbar-track { background: #1f2937; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            /* Light Mode  */
+            background-color: #f3f4f6;
+            background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g fill="%23d1d5db" fill-opacity="0.2"><path d="M0 40L40 0H20L0 20M40 40V20L20 40Z"/></g></svg>');
+            background-repeat: repeat;
+            color: #1f2937;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Dark Mode */
+        .dark body {
+            background-color: #030712;
+            background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g fill="%231f2937" fill-opacity="0.4"><path d="M0 40L40 0H20L0 20M40 40V20L20 40Z"/></g></svg>');
+            background-repeat: repeat;
+            color: #f9fafb;
+        }
+
+        #caption-history::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #caption-history::-webkit-scrollbar-thumb {
+            background: #ef4444;
+            /* Red 500 */
+            border-radius: 4px;
+        }
+
+        #caption-history::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
 
         .blinking-mic {
             animation: pulse-border 1.5s infinite;
         }
 
         @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+                /* Red 600 */
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+            }
+        }
+
+
+        #current-caption {
+            font-size: 2.5rem;
         }
     </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
 </head>
-<body class="bg-gray-900 text-gray-50 min-h-screen p-4 sm:p-8 flex flex-col items-center">
 
-    <div class="w-full max-w-4xl">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">
-                Indic Real-time Captioning
-            </h1>
-            <p class="text-gray-400">
-                Speech-to-Text, Simplification, and Multi-language Translation
-            </p>
-        </header>
+<body class="p-4 sm:p-8 flex flex-col items-center">
 
-        <!-- Configuration Panel -->
-        <div class="bg-gray-800 p-4 sm:p-6 rounded-xl shadow-lg mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-            
-            <div class="flex items-center gap-4 w-full sm:w-auto">
-                <label for="target-language" class="text-gray-300 font-medium whitespace-nowrap">Translate to:</label>
-                <select id="target-language" class="bg-gray-700 text-white p-2 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto">
-                    <!-- Updated with all 22 Scheduled Indian Languages for translation -->
-                    <option value="Hindi" selected>Hindi (हिंदी)</option>
-                    <option value="Assamese">Assamese (অসমীয়া)</option>
-                    <option value="Bengali">Bengali (বাংলা)</option>
-                    <option value="Bodo">Bodo (बोडो)</option>
-                    <option value="Dogri">Dogri (डोगरी)</option>
-                    <option value="Gujarati">Gujarati (ગુજરાતી)</option>
-                    <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
-                    <option value="Kashmiri">Kashmiri (کٲشُر)</option>
-                    <option value="Konkani">Konkani (कोंकणी)</option>
-                    <option value="Maithili">Maithili (मैथिली)</option>
-                    <option value="Malayalam">Malayalam (മലയാളം)</option>
-                    <option value="Manipuri">Manipuri (মৈতৈ)</option>
-                    <option value="Marathi">Marathi (मराठी)</option>
-                    <option value="Nepali">Nepali (नेपाली)</option>
-                    <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
-                    <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
-                    <option value="Sanskrit">Sanskrit (संस्कृतम्)</option>
-                    <option value="Santhali">Santhali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
-                    <option value="Sindhi">Sindhi (सिन्धी)</option>
-                    <option value="Tamil">Tamil (தமிழ்)</option>
-                    <option value="Telugu">Telugu (తెలుగు)</option>
-                    <option value="Urdu">Urdu (اُردُو)</option>
-                </select>
+    <div class="w-full max-w-5xl">
+        <header
+            class="bg-white dark:bg-gray-800 flex justify-between items-center mb-8 p-5 sm:p-7 rounded-2xl shadow-xl dark:shadow-gray-900/50 transition duration-300">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-4">
+                    <img src="logo.png" class="w-10 h-10 max-w-full h-auto rounded-lg">
+                    <h1 class="text-3xl font-extrabold text-red-600 dark:text-red-500 tracking-tight">
+                        Ekasruti
+                    </h1>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Speech-to-Text, Simplification, and Multi-language Translation
+                </p>
             </div>
 
-            <button id="toggle-mic" class="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-white transition duration-300 transform hover:scale-105 w-full sm:w-auto bg-blue-600 hover:bg-blue-700">
-                <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <button id="theme-toggle"
+                class="p-2 rounded-full transition duration-300 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                <svg id="moon-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                    </path>
+                </svg>
+                <svg id="sun-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+            </button>
+        </header>
+
+        <div
+            class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg dark:shadow-gray-900/50 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 transition duration-300">
+
+            <div class="flex flex-wrap items-center gap-4 w-full justify-center md:justify-start">
+                <div class="flex items-center gap-2">
+                    <label for="source-language"
+                        class="text-gray-700 dark:text-gray-400 font-semibold whitespace-nowrap">Source
+                        Language:</label>
+                    <select id="source-language"
+                        class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-red-500 focus:border-red-500 w-full sm:w-auto">
+                        <option value="en-US" selected>English (en-US)</option>
+                        <option value="Assamese">Assamese (অসমীয়া)</option>
+                        <option value="Bengali">Bengali (বাংলা)</option>
+                        <option value="Bodo">Bodo (बोडो)</option>
+                        <option value="Dogri">Dogri (डोगरी)</option>
+                        <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+                        <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+                        <option value="Kashmiri">Kashmiri (کٲشُر)</option>
+                        <option value="Konkani">Konkani (कोंকणी)</option>
+                        <option value="Maithili">Maithili (मैथिली)</option>
+                        <option value="Malayalam">Malayalam (മലയാളം)</option>
+                        <option value="Manipuri">Manipuri (মৈতৈ)</option>
+                        <option value="Marathi">Marathi (मराठी)</option>
+                        <option value="Nepali">Nepali (नेपाली)</option>
+                        <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
+                        <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+                        <option value="Sanskrit">Sanskrit (संस्कृतम्)</option>
+                        <option value="Santhali">Santhali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
+                        <option value="Sindhi">Sindhi (सिन्धी)</option>
+                        <option value="Tamil">Tamil (தமிழ்)</option>
+                        <option value="Telugu">Telugu (తెలుగు)</option>
+                        <option value="Urdu">Urdu (اُردُو)</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <select id="target-language"
+                        class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-auto">
+                        <option value="Hindi" selected>Hindi (हिंदी)</option>
+                        <option value="Assamese">Assamese (অসমীয়া)</option>
+                        <option value="Bengali">Bengali (বাংলা)</option>
+                        <option value="Bodo">Bodo (बोडो)</option>
+                        <option value="Dogri">Dogri (डोगरी)</option>
+                        <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+                        <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+                        <option value="Kashmiri">Kashmiri (کٲشُر)</option>
+                        <option value="Konkani">Konkani (कोंকणी)</option>
+                        <option value="Maithili">Maithili (मैथिली)</option>
+                        <option value="Malayalam">Malayalam (മലയാളം)</option>
+                        <option value="Manipuri">Manipuri (মৈতৈ)</option>
+                        <option value="Marathi">Marathi (मराठी)</option>
+                        <option value="Nepali">Nepali (नेपाली)</option>
+                        <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
+                        <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+                        <option value="Sanskrit">Sanskrit (संस्कृतम्)</option>
+                        <option value="Santhali">Santhali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
+                        <option value="Sindhi">Sindhi (सिन्धी)</option>
+                        <option value="Tamil">Tamil (தமிழ்)</option>
+                        <option value="Telugu">Telugu (తెలుగు)</option>
+                        <option value="Urdu">Urdu (اُردُو)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button id="toggle-mic"
+                class="flex items-center justify-center gap-3 px-10 py-3 rounded-full font-extrabold text-white uppercase tracking-wider transition duration-300 transform hover:scale-[1.02] shadow-xl w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/50">
+                <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20"
+                    fill="currentColor">
                     <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4z" clip-rule="evenodd" />
-                    <path fill-rule="evenodd" d="M11.668 11.28c.379.034.764.053 1.15.053 2.665 0 4.908-1.55 6.01-3.616a.75.75 0 01.373-.134.75.75 0 01.737.98 10.5 10.5 0 01-5.182 6.645 3.5 3.5 0 01-1.01.205c-.382 0-.756-.02-1.127-.058A7.5 7.5 0 015 12.378V10.75a.75.75 0 011.5 0v1.628c.365.04.735.066 1.11.066 1.259 0 2.454-.344 3.508-.957z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd"
+                        d="M11.668 11.28c.379.034.764.053 1.15.053 2.665 0 4.908-1.55 6.01-3.616a.75.75 0 01.373-.134.75.75 0 01.737.98 10.5 10.5 0 01-5.182 6.645 3.5 3.5 0 01-1.01.205c-.382 0-.756-.02-1.127-.058A7.5 7.5 0 015 12.378V10.75a.75.75 0 011.5 0v1.628c.365.04.735.066 1.11.066 1.259 0 2.454-.344 3.508-.957z"
+                        clip-rule="evenodd" />
                     <path d="M15.5 14.5a3 3 0 10-6 0v2a3 3 0 106 0v-2z" />
                 </svg>
-                <span id="mic-status-text">Start Captioning</span>
+                <span id="mic-status-text">Start</span>
             </button>
         </div>
 
-        <!-- Real-time Caption Area -->
-        <div class="bg-gray-800 p-4 sm:p-6 rounded-xl shadow-2xl">
-            <h2 class="text-xl font-semibold mb-4 text-blue-400">Live Captions</h2>
-            
-            <!-- Current Caption (Largest text for accessibility) -->
-            <div id="current-caption-container" class="min-h-[100px] flex items-center justify-center p-4 mb-4 rounded-lg border-2 border-blue-500 bg-gray-900">
-                <p id="current-caption" class="text-3xl sm:text-4xl font-bold text-green-400 text-center transition-opacity duration-500">
-                    Press "Start Captioning" and begin speaking in English or Hindi.
-                </p>
-                <div id="loading-spinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div class="bg-white dark:bg-gray-800 p-4 sm:p-8 rounded-2xl shadow-2xl dark:shadow-gray-900/50">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-red-600 dark:text-red-500">Live Captions</h2>
+                <div class="flex gap-2">
+                    <button id="size-increase"
+                        class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-600 hover:text-white transition duration-200 font-bold text-lg leading-none focus:outline-none">
+                        A+
+                    </button>
+                    <button id="size-decrease"
+                        class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-600 hover:text-white transition duration-200 font-bold text-lg leading-none focus:outline-none">
+                        A-
+                    </button>
+                </div>
             </div>
 
-            <!-- Caption History (Scrolling list of previous simplified/translated captions) -->
-            <div class="mt-6">
-                <h3 class="text-lg font-medium text-gray-300 mb-2 border-b border-gray-700 pb-1">Caption History</h3>
-                <div id="caption-history" class="h-48 overflow-y-auto space-y-2 p-3 bg-gray-900 rounded-lg text-sm text-gray-300">
-                    <p class="text-gray-500 italic">Captions will appear here after each sentence is spoken.</p>
+
+            <div id="current-caption-container"
+                class="min-h-[120px] flex items-center justify-center p-4 rounded-xl border-4 border-red-500 bg-gray-100 dark:bg-gray-900 transition duration-300 mb-6">
+                <p id="current-caption"
+                    class="font-extrabold text-red-600 dark:text-red-400 text-center transition-opacity duration-500 leading-snug">
+                    Press "<span class="text-indigo-600 dark:text-indigo-400">Start Captioning</span>" and begin
+                    speaking.
+                </p>
+                <div id="loading-spinner"
+                    class="hidden animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-red-500">
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">Simplified Source Text:</h3>
+                <div id="source-text"
+                    class="min-h-[60px] p-4 bg-gray-100 dark:bg-gray-900 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 italic">
+                    Simplified English will appaer here.
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h3
+                    class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-3 border-b border-gray-300 dark:border-gray-700 pb-1">
+                    Caption History</h3>
+                <div id="caption-history"
+                    class="h-56 overflow-y-auto space-y-3 p-4 bg-gray-100 dark:bg-gray-900 rounded-xl text-sm border border-gray-300 dark:border-gray-700">
+                    <p class="text-gray-500 dark:text-gray-500 italic">Captions will appear here after each sentence is
+                        spoken and processed.</p>
                 </div>
             </div>
         </div>
 
-        <!-- System Status/Log -->
-        <div id="status-log" class="mt-6 p-4 rounded-xl bg-gray-700 text-gray-300 text-sm">
+        <div id="status-log"
+            class="mt-8 p-4 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-400 text-sm font-mono shadow-md dark:shadow-gray-900/30">
             <p>System Ready. Waiting for microphone input.</p>
         </div>
     </div>
@@ -125,23 +258,32 @@
         const loadingSpinner = document.getElementById('loading-spinner');
         const captionHistory = document.getElementById('caption-history');
         const statusLog = document.getElementById('status-log');
+        const sourceLanguageSelect = document.getElementById('source-language');
         const targetLanguageSelect = document.getElementById('target-language');
+        const themeToggle = document.getElementById('theme-toggle');
+        const sourceTextDisplay = document.getElementById('source-text');
+        const sizeIncreaseButton = document.getElementById('size-increase');
+        const sizeDecreaseButton = document.getElementById('size-decrease');
+        const moonIcon = document.getElementById('moon-icon');
+        const sunIcon = document.getElementById('sun-icon');
+
 
         // --- State Variables ---
         let recognition;
         let isListening = false;
         let isProcessing = false;
+        let currentFontSizePx = 40;
+        const FONT_SIZE_STEP = 5;
+        const MAX_FONT_SIZE = 80;
+        const MIN_FONT_SIZE = 25;
+
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`;
         const API_KEY = "AIzaSyBSXlBab087ifMqXRbXCF4B3I6p-SzNtr8"; // Canvas will inject the API key
 
         // --- Utility Functions ---
 
         /**
-         * Logs status messages to the UI.
-         * @param {string} message 
-         * @param {string} color 
-         */
-        function updateStatus(message, color = 'text-gray-300') {
+        function updateStatus(message, color = 'text-gray-400') {
             statusLog.innerHTML = `<p class="${color}">${new Date().toLocaleTimeString()} - ${message}</p>`;
         }
 
@@ -158,14 +300,14 @@
                 } catch (error) {
                     if (i === maxRetries - 1) throw error;
                     const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
-                    updateStatus(`API call failed. Retrying in ${Math.round(delay / 1000)}s...`, 'text-yellow-400');
+                    updateStatus(`API call failed. Retrying in ${Math.round(delay / 1000)}s...`, 'text-yellow-500');
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
 
 
-        // --- ML/API Pipeline (Simplification & Translation) ---
+        // --- ML/API Pipeline ---
 
         /**
          * Simulates the ML backend pipeline: Simplification and Translation using Gemini.
@@ -175,10 +317,14 @@
         async function processAndTranslate(rawTranscript, targetLanguage) {
             if (isProcessing) return;
 
+            // Clear text display se
+            currentCaption.textContent = '';
+            sourceTextDisplay.textContent = 'Processing...';
+
             isProcessing = true;
             loadingSpinner.classList.remove('hidden');
             currentCaption.classList.add('hidden');
-            updateStatus(`Processing: Simplification & Translation to ${targetLanguage}...`, 'text-blue-300');
+            updateStatus(`Processing: Simplification & Translation to ${targetLanguage}...`, 'text-red-500');
 
             try {
                 const systemPrompt = `You are a Real-time Captioning System's core ML engine. Your job is twofold: first, simplify the provided raw speech transcript into clear, concise, short sentences, removing filler words, repetitive phrases, and keeping only the core semantic meaning. The output should be easy-to-read, short text suitable for closed captioning. Second, translate this simplified English text into the target Indian language: ${targetLanguage}. You must only return a JSON object following the provided schema.`;
@@ -222,51 +368,59 @@
                 const translatedCaption = parsedData.translated_text || 'Translation unavailable.';
                 const simplifiedEnglish = parsedData.simplified_english_text || 'Simplification unavailable.';
 
-                // Update UI
+                // --- Ui update ---
+
+                // Update Main Caption (Translated Text)
                 currentCaption.textContent = translatedCaption;
-                currentCaption.classList.remove('text-green-400', 'text-yellow-400');
-                currentCaption.classList.add('text-blue-400'); // Final color for translated text
+                currentCaption.classList.remove('text-red-800', 'text-yellow-400', 'text-indigo-400', 'dark:text-indigo-300');
+                currentCaption.classList.add('text-red-600', 'dark:text-red-400'); // Final color
+
+                // Update Source Text (Simplified English)
+                sourceTextDisplay.textContent = simplifiedEnglish;
+                sourceTextDisplay.classList.remove('italic', 'text-red-500');
+                sourceTextDisplay.classList.add('font-medium');
 
                 // Add to history
                 const historyItem = document.createElement('div');
-                historyItem.className = 'py-2 px-3 bg-gray-700 rounded-lg border-l-4 border-blue-500';
+                historyItem.className = 'py-3 px-4 bg-gray-200 dark:bg-gray-700 rounded-lg border-l-4 border-indigo-500 shadow-sm';
                 historyItem.innerHTML = `
-                    <p class="font-bold text-white">${translatedCaption}</p>
-                    <p class="text-xs text-gray-400 mt-1 italic">
+                    <p class="font-bold text-gray-900 dark:text-white text-base">${translatedCaption}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">
                         Simplified English: ${simplifiedEnglish}
                     </p>
                 `;
                 captionHistory.prepend(historyItem);
-                
-                // Clear the default message if it exists
-                if (captionHistory.querySelector('p.italic')) {
-                    captionHistory.querySelector('p.italic').remove();
+
+                // Clear the default history message if it exists
+                if (captionHistory.querySelector('p.italic.text-gray-500')) {
+                    captionHistory.querySelector('p.italic.text-gray-500').remove();
                 }
-                
-                updateStatus(`Caption delivered in ${targetLanguage}.`, 'text-green-400');
+
+                updateStatus(`Caption delivered in ${targetLanguage}.`, 'text-red-400');
 
             } catch (error) {
                 console.error("Gemini API Error:", error);
                 currentCaption.textContent = `Error: Could not process or translate. (${error.message.substring(0, 50)}...)`;
-                currentCaption.classList.remove('text-green-400', 'text-blue-400');
                 currentCaption.classList.add('text-red-500');
+
+                sourceTextDisplay.textContent = 'Error during processing.';
+                sourceTextDisplay.classList.remove('font-medium');
+                sourceTextDisplay.classList.add('italic', 'text-red-500');
+
                 updateStatus(`Error in ML pipeline: ${error.message}`, 'text-red-500');
             } finally {
                 isProcessing = false;
                 loadingSpinner.classList.add('hidden');
                 currentCaption.classList.remove('hidden');
-                // Auto-scroll history to the top for the newest item
                 captionHistory.scrollTop = 0;
             }
         }
 
-        // --- Speech Recognition (STT Module) ---
+        // --- Speech Recognition (MODIFIED SETUP TO USE DYNAMIC SOURCE LANGUAGE) ---
 
         function setupSpeechRecognition() {
-            // Check for Web Speech API support
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                // IMPORTANT: Replaced alert() with console/status update as per instructions
-                updateStatus('ERROR: Your browser does not support the Web Speech API. Please use Chrome or Edge.', 'text-red-500');
+                updateStatus('ERROR: Your browser does does not support the Web Speech API. Please use Chrome or Edge.', 'text-red-500');
                 toggleMicButton.disabled = true;
                 return;
             }
@@ -274,34 +428,36 @@
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
 
-            // Use the standard language for transcription (English/Hindi auto-detection)
-            // Setting the lang property for better recognition
-            recognition.lang = 'en-US'; 
-            recognition.continuous = true; // Keep listening after a pause
-            recognition.interimResults = true; // Show results as they are being spoken
+            //  MODIFICATION: Use the value from the sourceLanguageSelect 
+            recognition.lang = sourceLanguageSelect.value;
+
+
+            recognition.continuous = true;
+            recognition.interimResults = true;
 
             recognition.onstart = () => {
                 isListening = true;
-                toggleMicButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                // Updated button classes for listening state
+                toggleMicButton.classList.remove('bg-indigo-600', 'hover:bg-red-600', 'hover:bg-indigo-700');
                 toggleMicButton.classList.add('bg-red-600', 'hover:bg-red-700', 'blinking-mic');
-                micStatusText.textContent = 'Listening... Speak Now';
-                updateStatus('Microphone is ON. Listening for speech.', 'text-green-400');
+                micStatusText.textContent = 'Listening...';
+                updateStatus('Microphone is ON. Listening for speech.', 'text-green-500');
             };
 
             recognition.onend = () => {
                 isListening = false;
+                // Updated button classes for off state
                 toggleMicButton.classList.remove('bg-red-600', 'hover:bg-red-700', 'blinking-mic');
-                toggleMicButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                micStatusText.textContent = 'Start Captioning';
-                updateStatus('Microphone is OFF. Click to restart.', 'text-yellow-400');
-                
-                // Automatically restart if it stops unexpectedly while the user hasn't explicitly stopped it
-                if (isListening) {
-                     recognition.start();
-                }
+                toggleMicButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                micStatusText.textContent = 'Start'; // *** FIX: Changed to 'Start' ***
+                updateStatus('Microphone is OFF. Click to restart.', 'text-yellow-500');
+
+                // Clear source text display on stop
+                sourceTextDisplay.textContent = 'Simplified English will appear here.';
+                sourceTextDisplay.classList.add('italic', 'text-gray-600', 'dark:text-gray-300');
+                sourceTextDisplay.classList.remove('font-medium', 'text-red-500');
             };
-            
-            // This event fires as the user speaks (interimResults: true)
+
             recognition.onresult = (event) => {
                 let interimTranscript = '';
                 let finalTranscript = '';
@@ -317,13 +473,18 @@
 
                 // Show the raw, interim transcript immediately
                 currentCaption.textContent = interimTranscript;
-                currentCaption.classList.remove('text-blue-400');
-                currentCaption.classList.add('text-green-400'); // Green for raw/interim STT
+                currentCaption.classList.remove('text-red-600', 'dark:text-red-400');
+                currentCaption.classList.add('text-indigo-600', 'dark:text-indigo-400'); // Interim color
 
-                // Once a final result is captured (usually after a pause/sentence end)
+                // Update the source text display with raw text during interim phase
+                sourceTextDisplay.textContent = `Raw: "${interimTranscript}"`;
+                sourceTextDisplay.classList.add('italic');
+                sourceTextDisplay.classList.remove('font-medium');
+
+
+                // Once a final result is captured
                 if (finalTranscript.length > 0) {
                     updateStatus(`Raw Transcript Captured: "${finalTranscript}"`, 'text-white');
-                    // Send final text to the ML pipeline
                     processAndTranslate(finalTranscript.trim(), targetLanguageSelect.value);
                 }
             };
@@ -335,6 +496,48 @@
             };
         }
 
+        // theme change ---
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // seting initial theme
+        function setInitialTheme() {
+            const storedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (storedTheme === 'light' || (!storedTheme && !prefersDark)) {
+                document.documentElement.classList.remove('dark');
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.add('dark');
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            }
+        }
+
+        // --- Font Size Control Logic ---
+        function changeCaptionSize(direction) {
+            if (direction === 'increase' && currentFontSizePx < MAX_FONT_SIZE) {
+                currentFontSizePx += FONT_SIZE_STEP;
+            } else if (direction === 'decrease' && currentFontSizePx > MIN_FONT_SIZE) {
+                currentFontSizePx -= FONT_SIZE_STEP;
+            }
+            currentCaption.style.fontSize = `${currentFontSizePx}px`;
+        }
+
+
         // --- Event Listeners and Initialization ---
 
         toggleMicButton.addEventListener('click', () => {
@@ -345,23 +548,42 @@
                 recognition.stop();
             } else {
                 try {
+                    // Re-initialize recognition with the current selected language on every start
+                    setupSpeechRecognition(); // dynamic language
                     recognition.start();
                 } catch (e) {
                     console.error("Recognition start error:", e);
-                    // This often happens if start() is called when already started. onstart handler usually prevents this.
                 }
             }
         });
 
-        // Initialize Firebase (optional, for future features like saving transcripts)
+        themeToggle.addEventListener('click', toggleTheme);
+        sizeIncreaseButton.addEventListener('click', () => changeCaptionSize('increase'));
+        sizeDecreaseButton.addEventListener('click', () => changeCaptionSize('decrease'));
+
+        // *** LISTENER: Re-setup STT when source language changes ***
+        sourceLanguageSelect.addEventListener('change', () => {
+            if (isListening) {
+                recognition.stop(); // Stop current session
+            }
+            // setupSpeechRecognition will be called on the next start click, but we update status
+            updateStatus(`Source language set to ${sourceLanguageSelect.options[sourceLanguageSelect.selectedIndex].text}.`, 'text-blue-300');
+        });
+        // ************************************************************
+
+        // Target language change listener 
+        targetLanguageSelect.addEventListener('change', () => {
+            updateStatus(`Target language changed to ${targetLanguageSelect.options[targetLanguageSelect.selectedIndex].text}.`, 'text-blue-300');
+        });
+
+
+        // Initialize Firebase 
         function initializeFirebase() {
             if (firebaseConfig) {
-                // Use imported functions (initializeApp, getAuth, getFirestore)
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
                 const db = getFirestore(app);
-                
-                // Sign in anonymously or with custom token
+
                 if (initialAuthToken) {
                     signInWithCustomToken(auth, initialAuthToken)
                         .then((userCredential) => {
@@ -386,12 +608,13 @@
 
         // Setup on window load
         window.onload = () => {
+            setInitialTheme(); // theme setting
             initializeFirebase();
             setupSpeechRecognition();
-            targetLanguageSelect.addEventListener('change', () => {
-                updateStatus(`Target language changed to ${targetLanguageSelect.value}.`, 'text-blue-300');
-            });
+            // Set the initial font size dynamically
+            currentCaption.style.fontSize = `${currentFontSizePx}px`;
         };
     </script>
 </body>
+
 </html>
