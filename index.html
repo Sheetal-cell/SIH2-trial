@@ -23,6 +23,158 @@
             --color-shadow-card: rgba(0, 0, 0, 0.4);
             --color-shadow-deep: rgba(0, 0, 0, 0.9);
         }
+        /* --- HARAPPAN THEME --- */
+        .harappan-theme {
+            background-image: url('https://www.evokedholavira.com/wp-content/uploads/2024/02/Symbols-.webp'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            color: #f2e1b1; 
+        }
+
+        .harappan-theme .themed-card {
+            
+            background-color: rgba(120, 95, 60, 0.85); 
+    
+            
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+        
+            
+            color: #f2e1b1;
+            border: 1px solid #c6a56f; 
+            
+            box-shadow: 0 4px 60px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 255, 255, 0.1) inset; 
+            
+            }
+            
+        .harappan-theme .text-white {
+            color: #3b2f2f !important; 
+        }
+        .harappan-theme h1, 
+        .harappan-theme h2, 
+        .harappan-theme .font-extrabold,
+        .harappan-theme #status-log p {
+            color: #f2e1b1 !important; 
+        }
+        
+        
+        .harappan-theme [style*="--color-text-secondary"] {
+             color: #e8d09f !important; 
+        }
+        
+        
+        .harappan-theme [style*="--color-accent-teal"],
+        .harappan-theme .themed-input:focus {
+             color: #d4af37 !important; 
+             border-color: #d4af37 !important;
+        }
+
+        
+        .harappan-theme [style*="--color-accent-coral"] {
+            color: #995544 !important; 
+        }
+
+        .harappan-theme .btn-primary {
+           
+            background-color: #c6a56f !important; 
+            color: #3b2f2f !important; 
+            box-shadow: 0 4px 12px rgba(198, 165, 111, 0.6) !important;
+        }
+        .harappan-theme .btn-primary:hover {
+             
+             background-color: #b39562 !important; 
+        }
+
+        /* --- NEW SPLASH SCREEN STYLES & ANIMATIONS (Logo + Neon Text Zoom) --- */
+        .new-splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black; /* Solid black background */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            pointer-events: all;
+            overflow: hidden;
+            transition: opacity 0.3s ease-out; /* For final fade-out */
+        }
+
+        .splash-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 1; /* Will be animated */
+            transform: scale(1); /* Will be animated */
+            filter: blur(0px); /* Will be animated */
+            text-align: center;
+            will-change: opacity, transform, filter; /* Hint for browser optimization */
+        }
+
+        .splash-logo {
+            width: 120px; /* Adjust size as needed */
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 0px #E0BBE4) drop-shadow(0 0 0px #957DAD);
+        }
+
+        .splash-neon-text {
+            font-family: 'Varela Round', sans-serif;
+            font-size: 3.5rem; /* Adjust size as needed */
+            font-weight: bold;
+            color: #BBF7D0; /* Light green neon */
+            text-shadow: 
+                0 0 1px #05ff5c,
+                0 0 1px #BBF7D0,
+                0 0 1px #00ff59;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .splash-neon-slogan {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.4rem; /* Adjust size as needed */
+            color: #f384ff; /* Light purple neon */
+            text-shadow: 0 0 1px #E0BBE4, 0 0 1px #C3A6D7;
+            margin-top: 0;
+        }
+
+        /* Animation Keyframes: Zoom Out then Zoom In */
+        @keyframes zoomInOutVanish {
+            0% {
+                opacity: 1;
+                transform: scale(0.5); /* Start slightly zoomed out */
+                filter: blur(0px);
+            }
+            30% {
+                opacity: 1;
+                transform: scale(1.1); /* Zoom in */
+                filter: blur(0px);
+            }
+            60% {
+                opacity: 0.8;
+                transform: scale(0.8); /* Zoom out again slightly */
+                filter: blur(2px); /* Slight blur starts */
+            }
+            100% {
+                opacity: 0;
+                transform: scale(4); /* Zoom out and vanish */
+                filter: blur(15px); /* Heavy blur on vanish */
+                pointer-events: none;
+            }
+        }
+
+        /* Class to apply the animation */
+        .animate-splash-exit {
+            animation: zoomInOutVanish 1.8s ease-out forwards; /* 1.8 seconds duration */
+            animation-delay: 0.1s; /* Wait 0.8 seconds before starting the animation */
+        }
+        /* --- END NEW SPLASH SCREEN STYLES & ANIMATIONS --- */
 
         /* --- BASE STYLES & FONT --- */
         body { 
@@ -54,7 +206,13 @@
             pointer-events: none;
             will-change: transform, opacity;
             animation: pastel-float-up linear infinite;
+            animation-play-state: paused; /* ADDED: Stop the animation by default */
             border-radius: 50%;
+        }
+        
+        /* NEW CLASS: to explicitly start the animation on the dark theme */
+        .animated-element.active {
+            animation-play-state: running;
         }
 
 
@@ -133,8 +291,8 @@
         }
 
         /* Speaker Button Styles */
-        .speaker-a-active { background-color: #6474E5; color: white; } /* Indigo */
-        .speaker-b-active { background-color: #FACC15; color: #1C1E26; } /* Amber */
+        .speaker-a-active { background-color: #6474E5; color: white; } 
+        .speaker-b-active { background-color: #FACC15; color: #1C1E26; } 
         
         /* Floating Notification Bar Style */
         #notification-bar {
@@ -157,50 +315,57 @@
     </style>
 </head>
 <body class="p-4 sm:p-8">
+    <body>
 
-    <!-- BACKGROUND ANIMATION LAYER (Fixed, low z-index) -->
+    <div id="splash-screen" class="new-splash-screen">
+        <div class="splash-content-wrapper">
+            <img src="logo-main.png" class="splash-logo"> 
+            <h1 class="splash-neon-text">Ekasruti</h1>
+            <p class="splash-neon-slogan">A single note. A united Hermony</p>
+        </div>
+    </div>
+    
+    <div id="background-animation" class="fixed inset-0 z-[1] overflow-hidden"></div>
     <div id="background-animation" class="fixed inset-0 z-[1] overflow-hidden"></div> 
 
-    <!-- Main Content Wrapper (z-index 10) -->
+    <div id="background-animation" class="fixed inset-0 z-[1] overflow-hidden"></div> 
+
     <div class="w-full max-w-4xl mx-auto flex-grow z-10">
         
-        <!-- Header: Branding -->
-        <header class="flex justify-start items-center mb-8 p-2">
+        <header class="themed-card p-6 rounded-3xl shadow-xl mb-8 flex justify-between items-center">
             <div class="flex items-center">
                 <div class="p-3 rounded-full font-extrabold text-xl text-white hover:rotate-3 transition duration-300" style="background-color: var(--color-accent-coral);">EK</div>
                 <div class="ml-3">
-                    <h1 class="text-3xl font-extrabold" style="color: var(--color-accent-teal);">Ekasruti Dialogue</h1>
+                    <h1 class="text-3xl font-extrabold" style="color: var(--color-accent-teal);">Ekasruti</h1>
                     <p class="text-xs" style="color: var(--color-text-secondary);">23 Language STT & Translation Engine</p>
                 </div>
             </div>
+            
+            <button id="harappan-toggle" class="p-3 rounded-full btn-secondary hover:scale-105 transition duration-300" title="Toggle Harappan Theme">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-accent-coral);">
+                    <path d="M12 2v20M2 12h20M15 15a3 3 0 1 0-6 0 3 3 0 0 0 6 0zM12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/>
+                </svg>
+            </button>
         </header>
 
-        <!-- Control Panel -->
         <div class="themed-card p-6 rounded-3xl shadow-xl mb-8 flex flex-col gap-5">
             
-            <!-- Row 1: Languages, Speaker & Mic Control -->
             <div class="flex flex-col md:flex-row gap-4 w-full">
                 
-                <!-- Language Selectors (Grouped) -->
                 <div class="flex gap-4 w-full md:w-2/3">
-                    <!-- Source Language Selector -->
                     <div class="flex flex-col gap-1 w-1/2">
                         <label for="source-language" class="text-sm font-medium" style="color: var(--color-text-secondary);">Source (Spoken)</label>
                         <select id="source-language" class="themed-input p-3 rounded-lg font-bold focus:outline-none focus:ring-0">
-                            <!-- Options populated by JS -->
-                        </select>
+                            </select>
                     </div>
                     
-                    <!-- Target Language Selector -->
                     <div class="flex flex-col gap-1 w-1/2">
                         <label for="target-language" class="text-sm font-medium" style="color: var(--color-text-secondary);">Target (Caption)</label>
                         <select id="target-language" class="themed-input p-3 rounded-lg font-bold focus:outline-none focus:ring-0">
-                            <!-- Options populated by JS -->
-                        </select>
+                            </select>
                     </div>
                 </div>
 
-                <!-- Speaker Toggle & Mic Status (Grouped) -->
                 <div class="flex gap-4 w-full md:w-1/3">
                     <div class="flex flex-col gap-1 flex-grow">
                         <label class="text-sm font-medium" style="color: var(--color-text-secondary);">Current Speaker</label>
@@ -222,7 +387,6 @@
                 </div>
             </div>
 
-            <!-- Row 2: STT Warning -->
             <div id="stt-warning-box" class="p-3 rounded-xl border-2 hidden" style="border-color: var(--color-warning); background-color: rgba(255, 195, 0, 0.1);">
                 <p id="stt-warning-text" class="text-sm font-medium status-warning">
                     ⚠️ **STT Note:** The browser's speech recognition for this language is limited. Input will be processed using the English code, relying on the LLM's advanced language identification for accurate results.
@@ -230,7 +394,6 @@
             </div>
 
 
-            <!-- Row 3: Tone Control -->
             <div class="flex flex-col gap-1 w-full">
                 <label for="tone-input" class="text-sm font-medium" style="color: var(--color-text-secondary);">Translation Tone/Style Guide (Optional)</label>
                 <input 
@@ -242,18 +405,15 @@
             </div>
         </div>
 
-        <!-- Start Button (Coral Accent) -->
         <button id="toggle-mic" class="flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-extrabold transition duration-300 transform w-full uppercase btn-primary shadow-2xl mb-8">
             <span id="mic-status-text">Start Continuous Captioning</span>
         </button>
 
 
-        <!-- Live Captions Area & Controls -->
         <div class="themed-card p-6 rounded-3xl shadow-2xl mb-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-2 border-b border-dashed" style="border-color: var(--color-border);">
                 <h2 class="text-xl font-semibold" style="color: var(--color-accent-teal);">Live Translation Stream</h2>
                 
-                <!-- Font Size Controls -->
                 <div class="flex items-center gap-2 mt-2 sm:mt-0">
                     <span class="font-medium" style="color: var(--color-text-secondary);">Caption Size:</span>
                     <button id="font-decrease" class="p-2 rounded-lg btn-secondary hover:scale-105 transition font-extrabold text-lg" title="Decrease Font">-</button>
@@ -261,7 +421,6 @@
                 </div>
             </div>
             
-            <!-- 1. Current Prompt/Warning Box -->
             <div id="prompt-box" class="p-4 mb-5 rounded-2xl border-2 border-dashed" style="border-color: var(--color-danger); background-color: rgba(249, 76, 102, 0.1);" >
                 <p id="current-caption-prompt" class="text-xl font-medium status-danger text-center transition-opacity duration-500">
                     Ready! Press the button above to start continuous captioning.
@@ -269,20 +428,17 @@
                 <div id="loading-spinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-4 mx-auto" style="border-color: var(--color-accent-coral);"></div>
             </div>
 
-            <!-- 3. Translated Text Box (Target Language) - Highlighted Teal/FOCUS -->
             <div class="mt-4 p-4 rounded-xl themed-input shadow-lg text-center border-2" style="border-color: var(--color-accent-teal); background-color: var(--color-input-bg);">
                 <p class="text-sm font-semibold mb-1" id="translated-language-label" style="color: var(--color-accent-teal);">Translated Text (Hindi) - FOCUS:</p>
                 <p id="translated-text-display" class="font-extrabold min-h-[40px] transition duration-300" style="font-size: 2.5rem; color: var(--color-accent-teal);">...</p>
             </div>
 
-            <!-- 2. Source Text (Speaker & Simplified English) Box -->
             <div class="mt-4 p-4 rounded-xl themed-input">
                 <p class="text-sm font-semibold mb-1"><span id="speaker-source-label" class="text-indigo-400 font-extrabold">Speaker A:</span> Simplified English</p>
                 <p id="simplified-english-text" class="text-lg" style="color: var(--color-text-primary); min-height: 28px;">...</p>
             </div>
         </div>
 
-        <!-- History Panel -->
         <div class="themed-card p-4 rounded-3xl mb-6">
             <div class="flex justify-between items-center cursor-pointer hover:bg-opacity-90 transition p-1 -m-1 rounded" onclick="document.getElementById('history-content').classList.toggle('hidden');">
                 <h3 class="font-bold text-lg flex items-center gap-2" style="color: var(--color-text-primary);">
@@ -298,19 +454,16 @@
 
             <div id="history-content" class="mt-4 hidden max-h-60 overflow-y-auto">
                 <div id="caption-history-list" class="flex flex-col gap-3">
-                    <!-- History items will be inserted here -->
                     <p id="history-placeholder" style="color: var(--color-text-secondary);" class="text-center italic mt-2">No captions recorded yet. Start talking!</p>
                 </div>
             </div>
         </div>
 
-        <!-- System Status/Log -->
         <div id="status-log" class="mt-2 p-4 rounded-xl themed-card text-sm border-l-4" style="border-color: var(--color-accent-teal);">
             <p style="color: var(--color-text-secondary);">System Ready. Waiting for activation.</p>
         </div>
     </div>
     
-    <!-- Floating Notification Bar -->
     <div id="notification-bar" class="fixed bottom-5 left-1/2 -translate-x-1/2 py-2 px-5 text-sm transform transition-all duration-300"></div>
 
 
@@ -378,6 +531,7 @@
         const downloadHistoryButton = document.getElementById('download-history');
         const notificationBar = document.getElementById('notification-bar');
         const sttWarningBox = document.getElementById('stt-warning-box');
+        const harappanToggle = document.getElementById('harappan-toggle');
         
         // FEATURE ELEMENTS
         const speakerToggleButton = document.getElementById('speaker-toggle');
@@ -427,6 +581,18 @@
             for (let i = 0; i < NUM_PASTEL_BUBBLES; i++) {
                 createPastelBubble();
             }
+            // MODIFIED: Do NOT start animation here. It starts with the dark theme class.
+        }
+        
+        function togglePastelAnimation(shouldAnimate) {
+            const elements = document.querySelectorAll('.animated-element');
+            elements.forEach(el => {
+                if (shouldAnimate) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
         }
         // --- END Background Animation Setup ---
         
@@ -552,7 +718,7 @@
 
             const downloadText = captionHistory.map(entry => {
                 const toneInfo = entry.tone ? ` (Tone: ${entry.tone})` : '';
-                return `[${entry.timestamp}] [${entry.speaker}] (${entry.targetLang}${toneInfo})\n  Simplified English: ${entry.sourceText}\n  Translation: ${entry.translatedText}`;
+                return `[${entry.timestamp}] [${entry.speaker}] (${entry.targetLang}${toneInfo})\n  Simplified English: ${entry.sourceText}\n  Translation: ${entry.translatedText}`;
             }).join('\n---\n');
 
             const blob = new Blob([`Ekasruti Dialogue Caption History (23 Languages):\n\n${downloadText}`], { type: 'text/plain' });
@@ -602,6 +768,15 @@
             showNotification(`Active speaker switched to ${currentSpeaker}`);
             updateStatus(`Active speaker changed to ${currentSpeaker}.`, 'color-accent-coral');
         });
+        
+        // --- Harappan Theme Toggle (MODIFIED) ---
+        harappanToggle.addEventListener("click", () => {
+            const isHarappan = document.body.classList.toggle("harappan-theme");
+            
+            // Toggle the pastel bubble animation
+            togglePastelAnimation(!isHarappan); // Start animation if switching to dark theme (not harappan)
+        });
+
 
         // --- ML/API Pipeline CORE ---
 
@@ -631,7 +806,7 @@
                 // Determine instruction based on STT support
                 let sttNote = "";
                 if (sourceLangCode === "en-US" && sourceLanguageName !== "English") {
-                     // This indicates the STT was using a fallback code. LLM needs to ID the language first.
+                       // This indicates the STT was using a fallback code. LLM needs to ID the language first.
                     sttNote = `The raw transcript was generated using a generic language model (like English) because a specific STT code was unavailable. The user was speaking ${sourceLanguageName}. You MUST first identify the spoken ${sourceLanguageName} content from the raw transcript before simplifying and translating.`;
                 }
 
@@ -969,18 +1144,36 @@
         }
 
         // Setup on window load
+        // Setup on window load
         window.onload = () => {
+            const splashScreen = document.getElementById('splash-screen');
+            const splashContentWrapper = document.querySelector('.splash-content-wrapper'); // Target the wrapper for animation
+
+            // --- IMMEDIATE APP INITIALIZATION (runs in background) ---
             populateLanguageSelectors();
             updateFontSize(); 
-            initializeFirebase();
-            setupSpeechRecognition();
+            initializeFirebase(); 
+            setupSpeechRecognition(); 
             initializePastelAnimation(); 
+            togglePastelAnimation(true); 
             
-            // Set initial labels based on default selections
+            // Set initial labels
             translatedLanguageLabel.textContent = `Translated Text (${targetLanguageSelect.value}) - FOCUS:`;
             speakerSourceLabel.textContent = `${currentSpeaker}: Simplified English`;
-
             updateStatus('Ekasruti Dialogue v2.0: 23-Language System loaded and ready! Speak to translate.', 'color-text-primary');
+
+            // --- SPLASH SCREEN ANIMATION TRIGGER ---
+            const ANIMATION_START_DELAY = 200;  
+            const ANIMATION_DURATION = 1700; // 1.8 seconds for the animation (as per CSS)
+            const TOTAL_SPLASH_DISPLAY_TIME = ANIMATION_START_DELAY + ANIMATION_DURATION; // 2600ms or 2.6 seconds
+
+            // Trigger the animation on the content wrapper
+            splashContentWrapper.classList.add('animate-splash-exit');
+
+            // After the animation finishes, completely remove the splash screen from the DOM
+            setTimeout(() => {
+                splashScreen.remove(); 
+            }, TOTAL_SPLASH_DISPLAY_TIME + 0); 
         };
     </script>
 </body>
