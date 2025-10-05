@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ekasruti: Enhanced Live Dialogue Captioner</title>
+    <title>Ekasruti: Dark Theme Dialogue Captioner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Varela+Round&display=swap');
         
-        /* --- VIBRANT AESTHETIC CSS VARIABLES (Moody & Soft) --- */
-        :root, .dark-theme {
+        /* --- DARK THEME CSS VARIABLES (Moody & Soft) --- */
+        :root {
             --color-bg-body: #090C12; /* Deep Navy/Charcoal */
             --color-bg-card: rgba(20, 24, 33, 0.95); /* Card Background */
             --color-text-primary: #E5F4E3; 
@@ -23,21 +23,6 @@
             --color-shadow-deep: rgba(0, 0, 0, 0.9);
         }
 
-        /* --- LIGHT THEME OVERRIDES --- */
-        .light-theme {
-            --color-bg-body: #F5F7F9; 
-            --color-bg-card: rgba(255, 255, 255, 0.98); 
-            --color-text-primary: #1C1E26;
-            --color-text-secondary: #607C8A;
-            --color-input-bg: rgba(240, 244, 248, 0.8); 
-            --color-border: rgba(209, 217, 230, 0.8);
-            --color-accent-coral: #E85B5B; 
-            --color-accent-teal: #1DB9AA; 
-            --color-danger: #D84758; 
-            --color-shadow-card: rgba(0, 0, 0, 0.05);
-            --color-shadow-deep: rgba(0, 0, 0, 0.1);
-        }
-        
         /* --- BASE STYLES & FONT --- */
         body { 
             font-family: 'Inter', sans-serif; 
@@ -45,10 +30,34 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden; /* Prevent horizontal scroll from animation sway */
+            background-color: var(--color-bg-body); /* Ensure background is set */
+            color: var(--color-text-primary);
         }
         
+        /* --- BACKGROUND ANIMATION CSS (Pastel Bubbles) --- */
+        
+        @keyframes pastel-float-up {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+            50% { 
+                /* Uses JS-defined custom property for horizontal sway */
+                transform: translate(calc(var(--rand-x-offset) * 1px), -10vh) scale(1.05); 
+                opacity: 0.35; 
+            }
+            100% { transform: translate(0, -100vh) scale(0.8); opacity: 0; }
+        }
+
+        .animated-element {
+            position: absolute;
+            bottom: -50px;
+            pointer-events: none;
+            will-change: transform, opacity;
+            animation: pastel-float-up linear infinite;
+            border-radius: 50%;
+        }
+
+
         /* --- THEMED CLASSES --- */
-        .themed-bg { background-color: var(--color-bg-body); }
         .themed-card { 
             background-color: var(--color-bg-card); 
             color: var(--color-text-primary); 
@@ -146,13 +155,16 @@
 
     </style>
 </head>
-<body class="themed-bg dark-theme p-4 sm:p-8">
+<body class="p-4 sm:p-8">
 
-    <!-- Main Content Wrapper -->
+    <!-- BACKGROUND ANIMATION LAYER (Fixed, low z-index) -->
+    <div id="background-animation" class="fixed inset-0 z-[1] overflow-hidden"></div> 
+
+    <!-- Main Content Wrapper (z-index 10) -->
     <div class="w-full max-w-4xl mx-auto flex-grow z-10">
         
-        <!-- Header: Branding and Theme Toggle -->
-        <header class="flex justify-between items-center mb-8 p-2">
+        <!-- Header: Branding -->
+        <header class="flex justify-start items-center mb-8 p-2">
             <div class="flex items-center">
                 <div class="p-3 rounded-full font-extrabold text-xl text-white hover:rotate-3 transition duration-300" style="background-color: var(--color-accent-coral);">EK</div>
                 <div class="ml-3">
@@ -160,16 +172,6 @@
                     <p class="text-xs" style="color: var(--color-text-secondary);">Speech-focused Translation & Captioning Engine</p>
                 </div>
             </div>
-            
-            <!-- Theme Toggle Button -->
-            <button id="theme-toggle" class="p-3 rounded-full themed-card hover:scale-105 transition duration-200" title="Toggle Theme">
-                <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-yellow-300">
-                    <path d="M9.546 3.033A9.702 9.702 0 0 1 12 2.25c5.385 0 9.75 4.365 9.75 9.75 0 1.389-.327 2.748-.945 3.976a5.955 5.955 0 0 0-3.53-2.09c-.164-.265-.357-.49-.556-.693a8.21 8.21 0 0 0-2.34-1.428c-2.883-1.488-5.71-2.903-8.077-2.903h-.024c-.033 0-.066 0-.099.002h-.024l-.195.011a9.718 9.718 0 0 1-1.071.08h-.024a9.718 9.718 0 0 1-.774-.065c-.015-.002-.03-.004-.045-.006a.75.75 0 0 0-.756-.757 9.702 9.702 0 0 1 1.701-1.353Z" />
-                </svg>
-                <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-orange-400 hidden">
-                    <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.44 7.44a.75.75 0 0 1 1.06 0l1.5 1.5a.75.75 0 0 1-1.06 1.06l-1.5-1.5a.75.75 0 0 1 0-1.06ZM17.44 7.44a.75.75 0 0 0-1.06 0l-1.5 1.5a.75.75 0 0 0 1.06 1.06l1.5-1.5a.75.75 0 0 0 0-1.06ZM12 7.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9ZM19.5 12a.75.75 0 0 0 .75-.75h2.25a.75.75 0 0 0 0-1.5h-2.25a.75.75 0 0 0-.75.75ZM5.25 12a.75.75 0 0 1-.75.75H2.25a.75.75 0 0 1 0-1.5h2.25a.75.75 0 0 1 .75.75ZM15.94 15.94a.75.75 0 0 0 1.06 0l1.5-1.5a.75.75 0 0 0-1.06-1.06l-1.5 1.5a.75.75 0 0 0 0 1.06ZM7.44 15.94a.75.75 0 0 1 0-1.06l1.5-1.5a.75.75 0 0 1 1.06 1.06l-1.5 1.5a.75.75 0 0 1-1.06 0ZM12 17.25a.75.75 0 0 0-.75.75v2.25a.75.75 0 0 0 1.5 0v-2.25a.75.75 0 0 0-.75-.75Z" />
-                </svg>
-            </button>
         </header>
 
         <!-- Control Panel -->
@@ -330,9 +332,6 @@
 
         // --- DOM Elements ---
         const body = document.body;
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIconMoon = document.getElementById('theme-icon-moon');
-        const themeIconSun = document.getElementById('theme-icon-sun');
         const toggleMicButton = document.getElementById('toggle-mic');
         const micIndicatorVisual = document.getElementById('mic-indicator-visual');
         const currentCaptionPrompt = document.getElementById('current-caption-prompt');
@@ -360,7 +359,6 @@
         let recognition;
         let isListening = false;
         let isProcessing = false; 
-        let isDarkMode = true;
         let captionHistory = []; 
         let currentFontSize = 2.5; 
         let currentSpeaker = 'Speaker A'; 
@@ -369,27 +367,50 @@
         const MAX_FONT_SIZE = 4.0;
         const FONT_STEP = 0.5;
         
+        // --- Background Animation Constants & Setup ---
+        const animationContainer = document.getElementById('background-animation');
+        const NUM_PASTEL_BUBBLES = 30;
+        // Aesthetic Pastel Color Palette
+        const PASTEL_COLORS = ['#AEC6CF', '#FFDAB9', '#B399D4', '#77DD77', '#F49AC2', '#C3B1E1']; 
+
+        function rand(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function createPastelBubble() {
+            const element = document.createElement('div');
+            element.classList.add('animated-element');
+
+            const size = rand(20, 80); // Size variation for effect
+            const duration = rand(20, 50); // Animation duration in seconds (slow movement)
+            const delay = rand(0, 15); // Animation delay in seconds
+            const leftPosition = rand(0, 100); // Horizontal starting position %
+            const swayOffset = rand(-150, 150); // Random offset for sideways sway
+            const color = PASTEL_COLORS[rand(0, PASTEL_COLORS.length - 1)];
+
+            element.style.left = `${leftPosition}%`;
+            element.style.width = `${size}px`;
+            element.style.height = `${size}px`;
+            element.style.backgroundColor = color;
+            element.style.animationDuration = `${duration}s`;
+            element.style.animationDelay = `-${delay}s`;
+            element.style.setProperty('--rand-x-offset', swayOffset); // Custom property for sway
+
+            animationContainer.appendChild(element);
+        }
+
+        function initializePastelAnimation() {
+            for (let i = 0; i < NUM_PASTEL_BUBBLES; i++) {
+                createPastelBubble();
+            }
+        }
+        // --- END Background Animation Setup ---
+        
         // --- API URL ---
         // IMPORTANT: The API Key is intentionally left blank. The Canvas environment 
         // automatically provides the key at runtime for secure execution.
         const apiKey = "AIzaSyBSXlBab087ifMqXRbXCF4B3I6p-SzNtr8" 
         const GEMINI_API_BASE_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`; 
-
-        // --- Theme Functions ---
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            if (isDarkMode) {
-                body.classList.remove('light-theme');
-                body.classList.add('dark-theme');
-                themeIconMoon.classList.remove('hidden');
-                themeIconSun.classList.add('hidden');
-            } else {
-                body.classList.remove('dark-theme');
-                body.classList.add('light-theme');
-                themeIconMoon.classList.add('hidden');
-                themeIconSun.classList.remove('hidden');
-            }
-        }
 
         // --- Utility Functions ---
 
@@ -399,8 +420,8 @@
         function showNotification(message, isError = false) {
             notificationBar.textContent = message;
             
-            // Get dynamic colors from CSS variables
-            const successColor = getComputedStyle(document.documentElement).getPropertyValue(isDarkMode ? '--color-accent-teal' : '--color-accent-teal').trim();
+            // Get dynamic colors from CSS variables (always dark mode palette)
+            const successColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-teal').trim();
             const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--color-danger').trim();
 
             if (isError) {
@@ -483,7 +504,7 @@
                 return `[${entry.timestamp}] [${entry.speaker}] (${entry.targetLang}${toneInfo}) Source: ${entry.sourceText}\n  Translation: ${entry.translatedText}`;
             }).join('\n---\n');
 
-            const blob = new Blob([`Ekasruti Dialogue Caption History:\n\n${downloadText}`], { type: 'text/plain' });
+            const blob = new Blob([`Ekasruti Dialogue Caption History (Dark Theme):\n\n${downloadText}`], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -652,6 +673,7 @@
 
                 } else if (!currentCaptionPrompt.textContent.includes("ERROR") && !isListening) {
                     currentCaptionPrompt.textContent = 'Ready! Press the button above to start continuous captioning.';
+                    currentCaptionPrompt.classList.remove('themed-text-secondary'); // Ensure color is reset if it was set by status-danger above
                     currentCaptionPrompt.classList.add('status-danger');
                     promptBox.style.borderColor = `var(--color-danger)`;
                     promptBox.style.backgroundColor = `rgba(249, 76, 102, 0.1)`;
@@ -799,7 +821,6 @@
             }
         });
         
-        themeToggle.addEventListener('click', toggleTheme);
         downloadHistoryButton.addEventListener('click', downloadHistory);
 
 
@@ -850,11 +871,12 @@
 
         // Setup on window load
         window.onload = () => {
-            toggleTheme(); // Setup initial theme
             updateFontSize(); 
             
             initializeFirebase();
             setupSpeechRecognition();
+            initializePastelAnimation(); // Initialize the background animation
+            
             translatedLanguageLabel.textContent = `Translated Text (${targetLanguageSelect.value}) - FOCUS:`;
             speakerSourceLabel.textContent = `${currentSpeaker}: Simplified English`;
 
