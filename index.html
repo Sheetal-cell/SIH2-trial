@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ekasruti: Dark Theme Dialogue Captioner</title>
+    <title>Ekasruti: Comprehensive Indian Language Captioner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Varela+Round&display=swap');
@@ -19,6 +19,7 @@
             --color-accent-coral: #FF6B6B; /* Vibrant Coral */
             --color-accent-teal: #48E5C2; /* Aqua Green/Teal - LISTENING/TRANSLATION */
             --color-danger: #F94C66; 
+            --color-warning: #FFC300; /* Amber Warning */
             --color-shadow-card: rgba(0, 0, 0, 0.4);
             --color-shadow-deep: rgba(0, 0, 0, 0.9);
         }
@@ -119,6 +120,7 @@
 
         /* Status colors and inputs */
         .status-danger { color: var(--color-danger); }
+        .status-warning { color: var(--color-warning); }
         .themed-input {
             background-color: var(--color-input-bg);
             color: var(--color-text-primary);
@@ -152,7 +154,6 @@
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
-
     </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -169,7 +170,7 @@
                 <div class="p-3 rounded-full font-extrabold text-xl text-white hover:rotate-3 transition duration-300" style="background-color: var(--color-accent-coral);">EK</div>
                 <div class="ml-3">
                     <h1 class="text-3xl font-extrabold" style="color: var(--color-accent-teal);">Ekasruti Dialogue</h1>
-                    <p class="text-xs" style="color: var(--color-text-secondary);">Speech-focused Translation & Captioning Engine</p>
+                    <p class="text-xs" style="color: var(--color-text-secondary);">23 Language STT & Translation Engine</p>
                 </div>
             </div>
         </header>
@@ -186,14 +187,7 @@
                     <div class="flex flex-col gap-1 w-1/2">
                         <label for="source-language" class="text-sm font-medium" style="color: var(--color-text-secondary);">Source (Spoken)</label>
                         <select id="source-language" class="themed-input p-3 rounded-lg font-bold focus:outline-none focus:ring-0">
-                            <option value="en-US" selected>English</option>
-                            <option value="hi-IN">Hindi (हिंदी)</option>
-                            <option value="as-IN">Assamese (অসমীয়া)</option>
-                            <option value="bn-IN">Bengali (বাংলা)</option>
-                            <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
-                            <option value="ta-IN">Tamil (தமிழ்)</option>
-                            <option value="te-IN">Telugu (తెలుగు)</option>
-                            <option value="ur-IN">Urdu (اُردُو)</option>
+                            <!-- Options populated by JS -->
                         </select>
                     </div>
                     
@@ -201,14 +195,7 @@
                     <div class="flex flex-col gap-1 w-1/2">
                         <label for="target-language" class="text-sm font-medium" style="color: var(--color-text-secondary);">Target (Caption)</label>
                         <select id="target-language" class="themed-input p-3 rounded-lg font-bold focus:outline-none focus:ring-0">
-                            <option value="Hindi" selected>Hindi (हिंदी)</option>
-                            <option value="Assamese">Assamese (অসমীয়া)</option>
-                            <option value="Bengali">Bengali (বাংলা)</option>
-                            <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
-                            <option value="Tamil">Tamil (தமிழ்)</option>
-                            <option value="Telugu">Telugu (తెలుగు)</option>
-                            <option value="Urdu">Urdu (اُردُو)</option>
-                            <option value="English">English</option>
+                            <!-- Options populated by JS -->
                         </select>
                     </div>
                 </div>
@@ -235,7 +222,15 @@
                 </div>
             </div>
 
-            <!-- Row 2: Tone Control -->
+            <!-- Row 2: STT Warning -->
+            <div id="stt-warning-box" class="p-3 rounded-xl border-2 hidden" style="border-color: var(--color-warning); background-color: rgba(255, 195, 0, 0.1);">
+                <p id="stt-warning-text" class="text-sm font-medium status-warning">
+                    ⚠️ **STT Note:** The browser's speech recognition for this language is limited. Input will be processed using the English code, relying on the LLM's advanced language identification for accurate results.
+                </p>
+            </div>
+
+
+            <!-- Row 3: Tone Control -->
             <div class="flex flex-col gap-1 w-full">
                 <label for="tone-input" class="text-sm font-medium" style="color: var(--color-text-secondary);">Translation Tone/Style Guide (Optional)</label>
                 <input 
@@ -320,6 +315,40 @@
 
 
     <script type="module">
+        // --- Language Data (22 Scheduled Indian Languages + English) ---
+        // BCP-47 codes are used for the browser's Speech-to-Text (STT) input. 
+        // For languages without a specific STT code, the fallback is 'en-US' (stt: false), 
+        // relying on the LLM to identify and process the spoken language from the raw transcript.
+        const ALL_LANGUAGES = [
+            // Languages with strong BCP-47 support for Speech Recognition (stt: true)
+            { name: "English", native: "English", code: "en-US", stt: true },
+            { name: "Hindi", native: "हिंदी", code: "hi-IN", stt: true },
+            { name: "Bengali", native: "বাংলা", code: "bn-IN", stt: true },
+            { name: "Marathi", native: "मराठी", code: "mr-IN", stt: true },
+            { name: "Telugu", native: "తెలుగు", code: "te-IN", stt: true },
+            { name: "Tamil", native: "தமிழ்", code: "ta-IN", stt: true },
+            { name: "Gujarati", native: "ગુજરાતી", code: "gu-IN", stt: true },
+            { name: "Urdu", native: "اُردُو", code: "ur-IN", stt: true },
+            { name: "Kannada", native: "ಕನ್ನಡ", code: "kn-IN", stt: true },
+            { name: "Odia", native: "ଓଡ଼ିଆ", code: "or-IN", stt: true },
+            { name: "Malayalam", native: "മലയാളം", code: "ml-IN", stt: true },
+            { name: "Punjabi", native: "ਪੰਜਾਬੀ", code: "pa-IN", stt: true },
+            { name: "Assamese", native: "অসমীয়া", code: "as-IN", stt: true },
+            { name: "Nepali", native: "नेपाली", code: "ne-NP", stt: true },
+
+            // Languages with limited/no direct BCP-47 code support for Speech Recognition (stt: false)
+            // STT will use 'en-US' code, LLM handles the language identification and translation.
+            { name: "Kashmiri", native: "کٲشُر", code: "en-US", stt: false }, 
+            { name: "Konkani", native: "कोंकणी", code: "en-US", stt: false },
+            { name: "Sanskrit", native: "संस्कृतम्", code: "en-US", stt: false },
+            { name: "Sindhi", native: "سنڌي", code: "en-US", stt: false },
+            { name: "Dogri", native: "डोगरी", code: "en-US", stt: false },
+            { name: "Bodo", native: "बोडो", code: "en-US", stt: false },
+            { name: "Maithili", native: "মৈথিলী", code: "en-US", stt: false },
+            { name: "Santhali", native: "ᱥᱟᱱᱛᱟᱲᱤ", code: "en-US", stt: false },
+            { name: "Manipuri (Meitei)", native: "মণিপুরী", code: "en-US", stt: false }
+        ];
+
         // --- Firebase Imports & Setup (Required for Canvas) ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -331,7 +360,6 @@
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // --- DOM Elements ---
-        const body = document.body;
         const toggleMicButton = document.getElementById('toggle-mic');
         const micIndicatorVisual = document.getElementById('mic-indicator-visual');
         const currentCaptionPrompt = document.getElementById('current-caption-prompt');
@@ -349,6 +377,7 @@
         const historyPlaceholder = document.getElementById('history-placeholder');
         const downloadHistoryButton = document.getElementById('download-history');
         const notificationBar = document.getElementById('notification-bar');
+        const sttWarningBox = document.getElementById('stt-warning-box');
         
         // FEATURE ELEMENTS
         const speakerToggleButton = document.getElementById('speaker-toggle');
@@ -370,22 +399,18 @@
         // --- Background Animation Constants & Setup ---
         const animationContainer = document.getElementById('background-animation');
         const NUM_PASTEL_BUBBLES = 30;
-        // Aesthetic Pastel Color Palette
         const PASTEL_COLORS = ['#AEC6CF', '#FFDAB9', '#B399D4', '#77DD77', '#F49AC2', '#C3B1E1']; 
 
-        function rand(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+        function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
         function createPastelBubble() {
             const element = document.createElement('div');
             element.classList.add('animated-element');
-
-            const size = rand(20, 80); // Size variation for effect
-            const duration = rand(20, 50); // Animation duration in seconds (slow movement)
-            const delay = rand(0, 15); // Animation delay in seconds
-            const leftPosition = rand(0, 100); // Horizontal starting position %
-            const swayOffset = rand(-150, 150); // Random offset for sideways sway
+            const size = rand(20, 80); 
+            const duration = rand(20, 50); 
+            const delay = rand(0, 15); 
+            const leftPosition = rand(0, 100); 
+            const swayOffset = rand(-150, 150); 
             const color = PASTEL_COLORS[rand(0, PASTEL_COLORS.length - 1)];
 
             element.style.left = `${leftPosition}%`;
@@ -394,8 +419,7 @@
             element.style.backgroundColor = color;
             element.style.animationDuration = `${duration}s`;
             element.style.animationDelay = `-${delay}s`;
-            element.style.setProperty('--rand-x-offset', swayOffset); // Custom property for sway
-
+            element.style.setProperty('--rand-x-offset', swayOffset); 
             animationContainer.appendChild(element);
         }
 
@@ -407,12 +431,17 @@
         // --- END Background Animation Setup ---
         
         // --- API URL ---
-        // IMPORTANT: The API Key is intentionally left blank. The Canvas environment 
-        // automatically provides the key at runtime for secure execution.
         const apiKey = "AIzaSyBSXlBab087ifMqXRbXCF4B3I6p-SzNtr8" 
         const GEMINI_API_BASE_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`; 
 
         // --- Utility Functions ---
+
+        /**
+         * Finds language data by name.
+         */
+        function getLanguageDataByName(name) {
+            return ALL_LANGUAGES.find(lang => lang.name === name);
+        }
 
         /**
          * Shows a temporary, visually prominent notification bar.
@@ -420,7 +449,6 @@
         function showNotification(message, isError = false) {
             notificationBar.textContent = message;
             
-            // Get dynamic colors from CSS variables (always dark mode palette)
             const successColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-teal').trim();
             const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--color-danger').trim();
 
@@ -442,7 +470,7 @@
         /**
          * Logs status messages to the UI.
          */
-        function updateStatus(message, colorClass = 'themed-text-secondary') {
+        function updateStatus(message, colorClass = 'color-text-secondary') {
             const color = getComputedStyle(document.documentElement).getPropertyValue(`--${colorClass}`).trim() || '';
             statusLog.innerHTML = `<p style="color: ${color};">${new Date().toLocaleTimeString()} - ${message}</p>`;
         }
@@ -463,6 +491,31 @@
             }
         }
         
+        // --- Language List Population ---
+        function populateLanguageSelectors() {
+            // Populate Source Language Selector
+            ALL_LANGUAGES.forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang.name; // Use language name as the value for ease of LLM prompting
+                option.textContent = `${lang.name} (${lang.native})`;
+                option.setAttribute('data-code', lang.code);
+                option.setAttribute('data-stt-support', lang.stt);
+                
+                if (lang.name === "English") option.selected = true; // Default Source
+                sourceLanguageSelect.appendChild(option);
+            });
+
+            // Populate Target Language Selector
+            ALL_LANGUAGES.forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang.name; // Use language name as the value for LLM
+                option.textContent = `${lang.name} (${lang.native})`;
+                
+                if (lang.name === "Hindi") option.selected = true; // Default Target
+                targetLanguageSelect.appendChild(option);
+            });
+        }
+        
         // --- Caption History & Download Functions ---
 
         /**
@@ -473,16 +526,14 @@
             const newEntry = { timestamp, sourceText, translatedText, targetLang, speaker, tone };
             captionHistory.unshift(newEntry); 
             
-            // Determine speaker color for history
             const speakerColor = (speaker === 'Speaker A') ? 'text-indigo-400' : 'text-yellow-400';
 
-            // Render new entry
             const historyItem = document.createElement('div');
             historyItem.className = 'history-item p-3 rounded-lg themed-card transition-shadow hover:shadow-lg';
             historyItem.innerHTML = `
                 <p class="text-xs" style="color: var(--color-text-secondary);">${timestamp} - <span class="${speakerColor} font-bold">${speaker}</span> to ${targetLang}${tone ? ' (Tone: ' + tone + ')' : ''}:</p>
                 <p class="text-sm font-semibold" style="color: var(--color-text-primary);">${translatedText}</p>
-                <p class="text-xs italic mt-1" style="color: var(--color-text-secondary);">Source: ${sourceText}</p>
+                <p class="text-xs italic mt-1" style="color: var(--color-text-secondary);">Simplified English: ${sourceText}</p>
             `;
             captionHistoryList.prepend(historyItem);
 
@@ -501,10 +552,10 @@
 
             const downloadText = captionHistory.map(entry => {
                 const toneInfo = entry.tone ? ` (Tone: ${entry.tone})` : '';
-                return `[${entry.timestamp}] [${entry.speaker}] (${entry.targetLang}${toneInfo}) Source: ${entry.sourceText}\n  Translation: ${entry.translatedText}`;
+                return `[${entry.timestamp}] [${entry.speaker}] (${entry.targetLang}${toneInfo})\n  Simplified English: ${entry.sourceText}\n  Translation: ${entry.translatedText}`;
             }).join('\n---\n');
 
-            const blob = new Blob([`Ekasruti Dialogue Caption History (Dark Theme):\n\n${downloadText}`], { type: 'text/plain' });
+            const blob = new Blob([`Ekasruti Dialogue Caption History (23 Languages):\n\n${downloadText}`], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -554,7 +605,7 @@
 
         // --- ML/API Pipeline CORE ---
 
-        async function callGeminiApi(userQuery, systemPrompt, targetLanguage, sourceTextForHistory, tone) {
+        async function callGeminiApi(rawTranscript, targetLanguage, sourceLanguageName, sourceLangCode, tone) {
             
             if (isProcessing) {
                 updateStatus(`API is busy. Cannot process new request now.`, 'status-danger');
@@ -573,9 +624,27 @@
             let jsonText = null;
             try {
                 // Clear displays temporarily while waiting for API
-                simplifiedEnglishText.textContent = "Processing speech to simplified English...";
+                simplifiedEnglishText.textContent = "Processing raw speech to simplified English...";
                 translatedTextDisplay.textContent = "Translating...";
                 translatedTextDisplay.classList.remove('text-pop-animate');
+
+                // Determine instruction based on STT support
+                let sttNote = "";
+                if (sourceLangCode === "en-US" && sourceLanguageName !== "English") {
+                     // This indicates the STT was using a fallback code. LLM needs to ID the language first.
+                    sttNote = `The raw transcript was generated using a generic language model (like English) because a specific STT code was unavailable. The user was speaking ${sourceLanguageName}. You MUST first identify the spoken ${sourceLanguageName} content from the raw transcript before simplifying and translating.`;
+                }
+
+                const toneInstruction = tone ? `Additionally, ensure the output translation reflects the user's requested tone/style: "${tone}".` : '';
+
+                const systemPrompt = `You are a Real-time Dialogue Captioning System's core ML engine. Your job is three-fold: 
+                                      1. Take the raw speech transcript. ${sttNote}
+                                      2. Simplify it into clear, concise, short **English** sentences, removing filler words and verbal pauses. This is for the simplified_english_text field.
+                                      3. Translate the simplified English text into the target language: **${targetLanguage}**. This is for the translated_text field.
+                                      ${toneInstruction}
+                                      You must only return a JSON object following the provided schema.`;
+
+                const userQuery = `Raw transcript from ${currentSpeaker}: "${rawTranscript}". Spoken language: ${sourceLanguageName}. Target language: ${targetLanguage}.`;
 
                 const payload = {
                     contents: [{ parts: [{ text: userQuery }] }],
@@ -588,7 +657,7 @@
                             type: "OBJECT",
                             properties: {
                                 "simplified_english_text": { "type": "STRING", "description": "The simplified and concise English version of the raw transcript." },
-                                "translated_text": { "type": "STRING", "description": "The translation of the simplified English text into the target Indian language." }
+                                "translated_text": { "type": "STRING", "description": "The translation of the simplified English text into the target language." }
                             },
                             "propertyOrdering": ["simplified_english_text", "translated_text"]
                         }
@@ -620,17 +689,17 @@
                     throw new Error(`API returned text but failed JSON parsing. Raw text start: ${jsonText.substring(0, 500)}...`);
                 }
                 
-                const translatedCaption = parsedData.translated_text || '';
-                const simplifiedEnglish = parsedData.simplified_english_text || '';
+                const translatedCaption = parsedData.translated_text || 'Translation unavailable.';
+                const simplifiedEnglish = parsedData.simplified_english_text || '(No simplified English provided)';
                 
                 // Update UI with the Text Pop animation
-                simplifiedEnglishText.textContent = simplifiedEnglish || '(No simplified English provided)';
-                translatedTextDisplay.textContent = translatedCaption || 'Translation unavailable.';
+                simplifiedEnglishText.textContent = simplifiedEnglish;
+                translatedTextDisplay.textContent = translatedCaption;
                 translatedTextDisplay.classList.add('text-pop-animate');
                 setTimeout(() => translatedTextDisplay.classList.remove('text-pop-animate'), 400); 
 
                 // Save to history
-                if (translatedCaption) {
+                if (translatedCaption !== 'Translation unavailable.') {
                     saveToHistory(simplifiedEnglish, translatedCaption, targetLanguage, currentSpeaker, tone);
                 }
 
@@ -650,10 +719,7 @@
                 simplifiedEnglishText.textContent = `Error: Simplification failed.`;
                 translatedTextDisplay.textContent = `Error: Translation failed.`;
                 
-                // Display the error message
                 currentCaptionPrompt.textContent = errorMessage;
-                promptBox.style.borderColor = `var(--color-danger)`;
-                promptBox.style.backgroundColor = `rgba(249, 76, 102, 0.1)`;
                 currentCaptionPrompt.classList.add('status-danger');
 
                 updateStatus(`Critical error in ML pipeline: ${error.message}`, 'status-danger');
@@ -668,12 +734,22 @@
                     currentCaptionPrompt.textContent = `MIC ACTIVE: Listening for next sentence...`;
                     currentCaptionPrompt.classList.remove('status-danger');
                     currentCaptionPrompt.style.color = `var(--color-text-secondary)`;
-                    promptBox.style.borderColor = `var(--color-border)`;
-                    promptBox.style.backgroundColor = `var(--color-input-bg)`;
+                    
+                    // Re-apply warning box border if STT support is limited
+                    const selectedOption = sourceLanguageSelect.options[sourceLanguageSelect.selectedIndex];
+                    const hasSTTSupport = selectedOption.getAttribute('data-stt-support') === 'true';
+                    
+                    if (!hasSTTSupport) {
+                        promptBox.style.borderColor = `var(--color-warning)`;
+                        promptBox.style.backgroundColor = `rgba(255, 195, 0, 0.1)`;
+                    } else {
+                        promptBox.style.borderColor = `var(--color-border)`;
+                        promptBox.style.backgroundColor = `var(--color-input-bg)`;
+                    }
 
                 } else if (!currentCaptionPrompt.textContent.includes("ERROR") && !isListening) {
                     currentCaptionPrompt.textContent = 'Ready! Press the button above to start continuous captioning.';
-                    currentCaptionPrompt.classList.remove('themed-text-secondary'); // Ensure color is reset if it was set by status-danger above
+                    currentCaptionPrompt.classList.remove('themed-text-secondary'); 
                     currentCaptionPrompt.classList.add('status-danger');
                     promptBox.style.borderColor = `var(--color-danger)`;
                     promptBox.style.backgroundColor = `rgba(249, 76, 102, 0.1)`;
@@ -683,23 +759,6 @@
 
 
         // --- Speech Recognition (STT Module) ---
-
-        async function processAndTranslateMic(rawTranscript, targetLanguage, sourceLanguageName) {
-            
-            const tone = toneInput.value.trim();
-            const toneInstruction = tone ? `Additionally, ensure the output translation reflects the user's requested tone/style: "${tone}".` : '';
-            
-            const systemPrompt = `You are a Real-time Dialogue Captioning System's core ML engine. Your job is three-fold: 
-                                  1. Take the raw speech transcript (spoken in ${sourceLanguageName}).
-                                  2. Simplify it into clear, concise, short English sentences, removing filler words and verbal pauses. This is for the simplified_english_text field.
-                                  ${toneInstruction}
-                                  3. Translate the simplified English text into the target Indian language: ${targetLanguage}. This is for the translated_text field.
-                                  You must only return a JSON object following the provided schema.`;
-
-            const userQuery = `Raw transcript from ${currentSpeaker}: "${rawTranscript}". Source language: ${sourceLanguageName}. Target language: ${targetLanguage}.`;
-
-            await callGeminiApi(userQuery, systemPrompt, targetLanguage, rawTranscript, tone);
-        }
 
         function setupSpeechRecognition() {
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -711,7 +770,8 @@
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
 
-            recognition.lang = sourceLanguageSelect.value || 'en-US'; 
+            // Initial Language setting (will be updated on start)
+            recognition.lang = getLanguageDataByName(sourceLanguageSelect.value).code; 
             recognition.continuous = true; 
             recognition.interimResults = true; 
 
@@ -730,16 +790,37 @@
                 currentCaptionPrompt.textContent = "MIC ACTIVE: Listening for next sentence...";
                 currentCaptionPrompt.classList.remove('status-danger');
                 currentCaptionPrompt.style.color = `var(--color-text-secondary)`;
-                promptBox.style.borderColor = `var(--color-border)`;
-                promptBox.style.backgroundColor = `var(--color-input-bg)`;
+
+                // Adjust prompt box based on STT support
+                const selectedOption = sourceLanguageSelect.options[sourceLanguageSelect.selectedIndex];
+                const hasSTTSupport = selectedOption.getAttribute('data-stt-support') === 'true';
+                
+                if (!hasSTTSupport) {
+                    promptBox.style.borderColor = `var(--color-warning)`;
+                    promptBox.style.backgroundColor = `rgba(255, 195, 0, 0.1)`;
+                } else {
+                    promptBox.style.borderColor = `var(--color-border)`;
+                    promptBox.style.backgroundColor = `var(--color-input-bg)`;
+                }
+
 
                 updateStatus('Microphone is ON and continuous. Capturing speech.', 'color-accent-teal');
                 showNotification("Microphone is ACTIVE");
             };
 
             recognition.onend = () => {
-                // Only reset UI if we manually stopped it, not if an error occurred or it was trying to restart
-                if (!isListening) { 
+                // Critical Fix for Mobile: Auto-restart loop
+                if (isListening) { 
+                    updateStatus('Mobile session ended (resource limit). Auto-restarting...', 'color-accent-coral');
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error("Failed to auto-restart recognition:", e);
+                        isListening = false; 
+                        updateStatus('Auto-restart failed. Please manually restart.', 'status-danger');
+                    }
+                } else {
+                    // Manual Stop UI Reset Logic
                     toggleMicButton.classList.remove('mic-listening');
                     toggleMicButton.classList.add('btn-primary');
                     micIndicatorVisual.classList.remove('mic-listening');
@@ -749,7 +830,7 @@
                     
                     if (!isProcessing) {
                         currentCaptionPrompt.textContent = 'Ready! Press the button above to start continuous captioning.';
-                        currentCaptionPrompt.classList.remove('themed-text-secondary');
+                        currentCaptionPrompt.classList.remove('themed-text-secondary'); 
                         currentCaptionPrompt.classList.add('status-danger');
                         promptBox.style.borderColor = `var(--color-danger)`;
                         promptBox.style.backgroundColor = `rgba(249, 76, 102, 0.1)`;
@@ -771,17 +852,24 @@
                     }
                 }
 
-                // Show the raw, interim text being captured
                 currentCaptionPrompt.textContent = `Capturing (${currentSpeaker}): ${interimTranscript}`;
                 
                 if (finalTranscript.length > 0) {
-                    updateStatus(`Final sentence received from ${currentSpeaker}: "${finalTranscript.substring(0, 30)}..."`, 'color-text-primary');
+                    const selectedOption = sourceLanguageSelect.options[sourceLanguageSelect.selectedIndex];
+                    const sourceLangName = selectedOption.value; // The language name
+                    const sourceLangCode = selectedOption.getAttribute('data-code'); // The BCP-47 code
+                    const targetLangName = targetLanguageSelect.value;
+                    const tone = toneInput.value.trim();
+
+                    updateStatus(`Final speech segment received from ${currentSpeaker} (${sourceLangName}).`, 'color-text-primary');
                     
                     // Process the final text WITHOUT stopping the microphone.
-                    processAndTranslateMic(
+                    callGeminiApi(
                         finalTranscript.trim(), 
-                        targetLanguageSelect.value, 
-                        sourceLanguageSelect.options[sourceLanguageSelect.selectedIndex].text 
+                        targetLangName, 
+                        sourceLangName,
+                        sourceLangCode,
+                        tone
                     );
                 }
             };
@@ -790,15 +878,36 @@
                 console.error('Speech Recognition Error:', event.error);
                 updateStatus(`ERROR: Speech Recognition failed. (${event.error}).`, 'status-danger');
                 showNotification(`Mic Error: ${event.error}`, true);
-                
-                if(isListening) {
-                     isListening = false;
-                     recognition.stop(); 
-                }
             };
         }
 
         // --- Event Listeners and Initialization ---
+
+        function handleSourceLanguageChange() {
+            const selectedOption = sourceLanguageSelect.options[sourceLanguageSelect.selectedIndex];
+            const sourceLangName = selectedOption.value;
+            const sourceLangCode = selectedOption.getAttribute('data-code');
+            const hasSTTSupport = selectedOption.getAttribute('data-stt-support') === 'true';
+
+            // Show or hide the STT warning box
+            if (!hasSTTSupport) {
+                sttWarningBox.classList.remove('hidden');
+                updateStatus(`Source language set to ${sourceLangName}. Warning: Browser STT support is limited, relying on LLM ID.`, 'status-warning');
+            } else {
+                sttWarningBox.classList.add('hidden');
+                updateStatus(`Source language set to ${sourceLangName} (STT code: ${sourceLangCode}).`, 'color-text-secondary');
+            }
+            showNotification(`Source: ${sourceLangName}`);
+
+            if (recognition) {
+                const wasListening = isListening;
+                if(wasListening) recognition.stop();
+                // Update the BCP-47 code for the next start
+                recognition.lang = sourceLangCode; 
+                if(wasListening) recognition.start();
+            }
+        }
+
 
         toggleMicButton.addEventListener('click', () => {
             if (!recognition) {
@@ -810,8 +919,9 @@
             } else {
                 try {
                     isListening = true;
-                    // Re-assign language when starting
-                    recognition.lang = sourceLanguageSelect.value;
+                    // Ensure the language is set using the BCP-47 code from the selected option's data attribute
+                    const selectedOption = sourceLanguageSelect.options[sourceLanguageSelect.selectedIndex];
+                    recognition.lang = selectedOption.getAttribute('data-code');
                     recognition.start();
                 } catch (e) {
                     console.error("Recognition start error:", e);
@@ -822,23 +932,12 @@
         });
         
         downloadHistoryButton.addEventListener('click', downloadHistory);
-
+        sourceLanguageSelect.addEventListener('change', handleSourceLanguageChange);
 
         targetLanguageSelect.addEventListener('change', (e) => {
             translatedLanguageLabel.textContent = `Translated Text (${e.target.value}) - FOCUS:`;
             updateStatus(`Target language changed to ${e.target.value}.`, 'color-text-secondary');
             showNotification(`Target: ${e.target.value}`);
-        });
-
-        sourceLanguageSelect.addEventListener('change', (e) => {
-            updateStatus(`Source language changed to ${e.target.options[e.target.selectedIndex].text}. (STT language updated)`, 'color-text-secondary');
-            showNotification(`Source: ${e.target.options[e.target.selectedIndex].text}`);
-            if (recognition) {
-                const wasListening = isListening;
-                if(wasListening) recognition.stop();
-                recognition.lang = e.target.value;
-                if(wasListening) recognition.start();
-            }
         });
 
         // Initialize Firebase (boilerplate requirement)
@@ -871,16 +970,17 @@
 
         // Setup on window load
         window.onload = () => {
+            populateLanguageSelectors();
             updateFontSize(); 
-            
             initializeFirebase();
             setupSpeechRecognition();
-            initializePastelAnimation(); // Initialize the background animation
+            initializePastelAnimation(); 
             
+            // Set initial labels based on default selections
             translatedLanguageLabel.textContent = `Translated Text (${targetLanguageSelect.value}) - FOCUS:`;
             speakerSourceLabel.textContent = `${currentSpeaker}: Simplified English`;
 
-            updateStatus('Ekasruti Dialogue v1.1: System loaded and ready! Speak to translate.', 'color-text-primary');
+            updateStatus('Ekasruti Dialogue v2.0: 23-Language System loaded and ready! Speak to translate.', 'color-text-primary');
         };
     </script>
 </body>
