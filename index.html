@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ekasruti: Comprehensive Indian Language Captioner</title>
+    <link rel="icon" href="logo-main.png" type="image/x-icon">
+  <link rel="icon" href="logo-main.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Varela+Round&display=swap');
@@ -139,7 +141,7 @@
         .splash-neon-slogan {
             font-family: 'Inter', sans-serif;
             font-size: 1.4rem; /* Adjust size as needed */
-            color: #f384ff; /* Light purple neon */
+            color: #FF6B6B; /* Light pink neon */
             text-shadow: 0 0 1px #E0BBE4, 0 0 1px #C3A6D7;
             margin-top: 0;
         }
@@ -320,8 +322,9 @@
     <div id="splash-screen" class="new-splash-screen">
         <div class="splash-content-wrapper">
             <img src="logo-main.png" class="splash-logo"> 
-            <h1 class="splash-neon-text">Ekasruti</h1>
-            <p class="splash-neon-slogan">A single note. A united Hermony</p>
+            <h1 class="splash-neon-text">EkaSruti</h1>
+            <p class="splash-neon-slogan">Har Zubaan, Ek Samvaad:</p>
+            <p>India Speaks as One!</p>
         </div>
     </div>
     
@@ -334,10 +337,13 @@
         
         <header class="themed-card p-6 rounded-3xl shadow-xl mb-8 flex justify-between items-center">
             <div class="flex items-center">
-                <div class="p-3 rounded-full font-extrabold text-xl text-white hover:rotate-3 transition duration-300" style="background-color: var(--color-accent-coral);">EK</div>
+                <!-- START LOGO INTEGRATION (IMAGE) --><div class="flex-shrink-0 w-10 h-10">
+                <img src="logo-main.png" alt="Your Company Logo" class="w-full h-full object-contain">
+            </div>
+            <!-- END LOGO INTEGRATION --><div>
                 <div class="ml-3">
-                    <h1 class="text-3xl font-extrabold" style="color: var(--color-accent-teal);">Ekasruti</h1>
-                    <p class="text-xs" style="color: var(--color-text-secondary);">23 Language STT & Translation Engine</p>
+                    <h1 class="text-3xl font-extrabold" style="color: var(--color-accent-teal);">EkaSruti</h1>
+                    <h3 class="text-xs" style="color: var(--color-text-secondary); font-style: bold; font-weight: large;">Har Zubaan, Ek Samvaad</h3>
                 </div>
             </div>
             
@@ -1160,7 +1166,7 @@
             // Set initial labels
             translatedLanguageLabel.textContent = `Translated Text (${targetLanguageSelect.value}) - FOCUS:`;
             speakerSourceLabel.textContent = `${currentSpeaker}: Simplified English`;
-            updateStatus('Ekasruti Dialogue v2.0: 23-Language System loaded and ready! Speak to translate.', 'color-text-primary');
+            updateStatus('Ekasruti live captioning: 23-Language System loaded and ready! Speak to translate.', 'color-text-primary');
 
             // --- SPLASH SCREEN ANIMATION TRIGGER ---
             const ANIMATION_START_DELAY = 200;  
